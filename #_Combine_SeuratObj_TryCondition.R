@@ -126,11 +126,7 @@
   scRNA.SeuObj_Ori <- scRNA.SeuObj
   scRNA.SeuObj_Ref <- scRNA.SeuObj[,scRNA.SeuObj@meta.data[["DataSetID"]] %in% "PRJCA001063"]
   DimPlot(scRNA.SeuObj_Ref, reduction = "umap",group.by = "Cell_type")
-  # scRNA.SeuObj_2 <- scRNA.SeuObj[,scRNA.SeuObj@meta.data[["DataSetID"]] %in% "GSE131886"]
-  # scRNA.SeuObj_3 <- scRNA.SeuObj[,scRNA.SeuObj@meta.data[["DataSetID"]] %in% "GSE154778"]
 
-  # scRNA.SeuObj_Ref <- scRNA.SeuObj_1
-  # scRNA.SeuObj <- scRNA.SeuObj_2
   RefName = "Cell_type"
   RefName2 = "DataSetID"
   Remark1 <- "PredbyCTDB"         # "PredbyscRNA_CT_GSE131886"
@@ -140,71 +136,8 @@
   scRNA.SeuObj@meta.data[["celltype"]] <- scRNA.SeuObj@meta.data[[paste0("singleR_",Remark)]]
   scRNA.SeuObj@meta.data[[paste0("singleR_",Remark)]] <- NULL
 
-  # scRNA.SeuObj_2 <- scRNA.SeuObj
-
-  # scRNA.SeuObj_2@meta.data[["Cell_type"]] <- scRNA.SeuObj_2@meta.data[[paste0("singleR_",Remark)]]
-  # scRNA.SeuObj_2@meta.data[["celltype"]] <- scRNA.SeuObj_2@meta.data[[paste0("singleR_",Remark)]]
-  # scRNA.SeuObj_2@meta.data[[paste0("singleR_",Remark)]] <- NULL
-
-  scRNA.SeuObj <- scRNA.SeuObj_2
-  RefName = "ReCluster2"
-  RefName2 = "DataSetID"
-  Remark1 <- "ReCl_GSE131886"
-  source("CellTypeAnno_SingleR.R", encoding="UTF-8")
-  scRNA.SeuObj_2 <- scRNA.SeuObj
-
-  scRNA.SeuObj_2@meta.data[["ReCluster2"]] <- scRNA.SeuObj_2@meta.data[[paste0("singleR_",Remark)]]
-  scRNA.SeuObj_2@meta.data[[paste0("singleR_",Remark)]] <- NULL
-
-  scRNA.SeuObj <- scRNA.SeuObj_3
-  RefName = "Cell_type"
-  RefName2 = "DataSetID"
-  Remark1 <- "CT_GSE154778"
-  source("CellTypeAnno_SingleR.R", encoding="UTF-8")
-  scRNA.SeuObj_3 <- scRNA.SeuObj
-
-  scRNA.SeuObj_3@meta.data[["Cell_type"]] <- scRNA.SeuObj_3@meta.data[[paste0("singleR_",Remark)]]
-  scRNA.SeuObj_3@meta.data[["celltype"]] <- scRNA.SeuObj_3@meta.data[[paste0("singleR_",Remark)]]
-  scRNA.SeuObj_3@meta.data[[paste0("singleR_",Remark)]] <- NULL
-
-  scRNA.SeuObj <- scRNA.SeuObj_3
-  RefName = "ReCluster2"
-  RefName2 = "DataSetID"
-  Remark1 <- "ReCl_GSE154778"
-  source("CellTypeAnno_SingleR.R", encoding="UTF-8")
-  scRNA.SeuObj_3 <- scRNA.SeuObj
-
-  scRNA.SeuObj_3@meta.data[["ReCluster2"]] <- scRNA.SeuObj_3@meta.data[[paste0("singleR_",Remark)]]
-  scRNA.SeuObj_3@meta.data[[paste0("singleR_",Remark)]] <- NULL
-
-  # scRNA_SeuObj.list <- list(PRJCA001063 = scRNA.SeuObj_1,
-  #                           GSE131886 = scRNA.SeuObj_2,
-  #                           GSE154778 = scRNA.SeuObj_3)
-  #
-  # scRNA.SeuObj <- CombineSeuObj(scRNA_SeuObj.list)
-  #### rm(scRNA_SeuObj.list,scRNA.SeuObj_1,scRNA.SeuObj_2,scRNA.SeuObj_3,scRNA.SeuObj_Ref)
-
-  # scRNA.SeuObj <- merge(scRNA.SeuObj_1, scRNA.SeuObj_2)
-  # scRNA.SeuObj <- merge(scRNA.SeuObj, scRNA.SeuObj_3)
   # DefaultAssay(scRNA.SeuObj) <- "RNA"
-  # # rm(scRNA.SeuObj_1,scRNA.SeuObj_2,scRNA.SeuObj_3,scRNA.SeuObj_Ref)
-
-  scRNA.SeuObj <- scRNA.SeuObj_Ori
-  # meta_ori.df <- scRNA.SeuObj@meta.data %>%
-  #                dplyr::select(CELL)
-  #
-  # meta_ann.df <- rbind(scRNA.SeuObj_1@meta.data,
-  #                      scRNA.SeuObj_2@meta.data,
-  #                      scRNA.SeuObj_3@meta.data)
-  #
-  # meta.df <-   dplyr::left_join(meta_ori.df,meta_ann.df)
-  # scRNA.SeuObj@meta.data <- meta.df
-
-  meta_ann.df <- rbind(scRNA.SeuObj_1@meta.data,
-                       scRNA.SeuObj_2@meta.data,
-                       scRNA.SeuObj_3@meta.data)
-  scRNA.SeuObj@meta.data <- meta_ann.df
-  DefaultAssay(scRNA.SeuObj) <- "RNA"
+  FeaturePlot(scRNA.SeuObj, features = c("TOP2A"))
   DimPlot(scRNA.SeuObj, reduction = "umap",group.by = "Cell_type")
   DimPlot(scRNA.SeuObj, reduction = "umap",group.by = "ReCluster2")
   DimPlot(scRNA.SeuObj, reduction = "umap",group.by = "DataSetID")
