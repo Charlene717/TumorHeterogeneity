@@ -2,7 +2,7 @@
   rm(list = ls()) # Clean variable
   memory.limit(300000)
 
-##### Load Packages #####
+##### Load basic packages #####
   if(!require("Seurat")) install.packages("Seurat")
   if(!require("tidyverse")) install.packages("tidyverse")
   library(tidyverse)
@@ -104,8 +104,23 @@
   # scRNA.SeuObj <- FindVariableFeatures(scRNA.SeuObj, selection.method = "vst", nfeatures = 2000)
   scRNA.SeuObj <- FindVariableFeatures(scRNA.SeuObj)
   # Run the standard workflow for visualization and clustering
-  scRNA.SeuObj <- ScaleData(scRNA.SeuObj, verbose = FALSE)
-  scRNA.SeuObj <- RunPCA(scRNA.SeuObj, npcs = 160, verbose = FALSE)
+  scRNA.SeuObj <- ScaleData(scRNA.SeuObj)
+
+  ## PCA: Finding the right PCA conditions
+  scRNA.SeuObj <- RunPCA(scRNA.SeuObj, npcs = 160)
+  VizDimLoadings(scRNA.SeuObj, dims = 1:2, reduction = "pca")
+  DimPlot(scRNA.SeuObj, reduction = "pca")
+  DimHeatmap(scRNA.SeuObj, dims = 1, cells = 500, balanced = TRUE)
+  DimHeatmap(scRNA.SeuObj, dims = 1:15, cells = 500, balanced = TRUE)
+  # Determine the ‘dimensionality’ of the dataset
+    # NOTE: This process can take a long time for big datasets, comment out for expediency. More approximate techniques such as those implemented in ElbowPlot() can be used to reduce computation time
+    pbmc <- scRNA.SeuObj
+    pbmc <- JackStraw(pbmc, num.replicate = 100)
+    pbmc <- ScoreJackStraw(pbmc, dims = 1:20)
+    JackStrawPlot(pbmc, dims = 1:15)
+    ElbowPlot(pbmc)
+
+  ## UMAP
   scRNA.SeuObj <- RunUMAP(scRNA.SeuObj, reduction = "pca", dims = 1:160,n.neighbors = 20,min.dist = 0.3)
   scRNA.SeuObj <- FindNeighbors(scRNA.SeuObj, reduction = "pca", dims = 1:160)
   scRNA.SeuObj <- FindClusters(scRNA.SeuObj, resolution = 0.5)
