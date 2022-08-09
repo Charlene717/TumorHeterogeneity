@@ -16,7 +16,6 @@
   scRNA.SeuObj_2 <- scRNA.SeuObj
   DefaultAssay(scRNA.SeuObj_2) <- "RNA"
 
-
   load("D:/Dropbox/##_GitHub/#_scRNADataset/SeuratObject_GSE154778_PDAC_SC.RData")
   scRNA.SeuObj_3 <- scRNA.SeuObj
   DefaultAssay(scRNA.SeuObj_3) <- "RNA"
@@ -30,7 +29,7 @@
 ##### Current path and new folder setting* #####
   ProjectName = "Com"
   Sampletype = "PDAC"
-  #ProjSamp.Path = paste0(Sampletype,"_",ProjectName)
+  # ProjSamp.Path = paste0(Sampletype,"_",ProjectName)
 
   Version = paste0(Sys.Date(),"_",ProjectName,"_",Sampletype)
   Save.Path = paste0(getwd(),"/",Version)
@@ -107,7 +106,7 @@
   scRNA.SeuObj <- ScaleData(scRNA.SeuObj)
 
   ## PCA: Finding the right PCA conditions
-  scRNA.SeuObj <- RunPCA(scRNA.SeuObj, npcs = 160)
+  scRNA.SeuObj <- RunPCA(scRNA.SeuObj, npcs = 200)
   VizDimLoadings(scRNA.SeuObj, dims = 1:2, reduction = "pca")
   DimPlot(scRNA.SeuObj, reduction = "pca")
   DimHeatmap(scRNA.SeuObj, dims = 1, cells = 500, balanced = TRUE)
@@ -121,8 +120,8 @@
     ElbowPlot(pbmc)
 
   ## UMAP
-  scRNA.SeuObj <- RunUMAP(scRNA.SeuObj, reduction = "pca", dims = 1:160,n.neighbors = 20,min.dist = 0.3)
-  scRNA.SeuObj <- FindNeighbors(scRNA.SeuObj, reduction = "pca", dims = 1:160)
+  scRNA.SeuObj <- RunUMAP(scRNA.SeuObj, reduction = "pca", dims = 1:200,n.neighbors = 20,min.dist = 0.3)
+  scRNA.SeuObj <- FindNeighbors(scRNA.SeuObj, reduction = "pca", dims = 1:200)
   scRNA.SeuObj <- FindClusters(scRNA.SeuObj, resolution = 0.5)
 
   #### Save RData #####
@@ -131,6 +130,7 @@
 
   ##### Plot #####
   FeaturePlot(scRNA.SeuObj, features = c("TOP2A"))
+
   # DimPlot(scRNA.SeuObj, reduction = "umap")
   DimPlot(scRNA.SeuObj, reduction = "umap",label = T)
   DimPlot(scRNA.SeuObj, reduction = "umap",group.by = "Cell_type")
@@ -219,6 +219,13 @@
   DimPlot(scRNA.SeuObj, reduction = "umap",group.by = "ReCluster2")
   DimPlot(scRNA.SeuObj, reduction = "umap",group.by = "DataSetID")
   DimPlot(scRNA.SeuObj, reduction = "umap")
+
+  ## Cancer stem cell marker gene
+  FeaturePlot(scRNA.SeuObj, features = c("TOP2A", "CD24", "CD44", "EPCAM"))
+  # https://molecular-cancer.biomedcentral.com/articles/10.1186/s12943-022-01596-8
+  FeaturePlot(scRNA.SeuObj, features = c("CD133", "CXCR4", "CD44", "ABCG2","ALDH1A1","MET"))
+  # https://pubmed.ncbi.nlm.nih.gov/29948612/#:~:text=Cancer%20stem%20cells%20(CSCs)%2C,resistance%20to%20chemotherapy%20and%20radiation.
+
 
   rm(meta_ori.df, meta_ann.df, meta.df, scRNA.SeuObj_Ori,
      SingleRResult.lt, CTFeatures.SeuObj)
