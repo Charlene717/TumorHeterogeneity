@@ -77,11 +77,15 @@
   library(monocle)
   devtools::install_github("cole-trapnell-lab/garnett")
   devtools::install_github('cole-trapnell-lab/monocle3')
+  #devtools::install_github("cole-trapnell-lab/monocle3", ref="develop")
   devtools::install_github("LTLA/SingleR")
 
   library(monocle3)
   library(garnett)
-  # library(SingleR)
+  library(SingleR)
+
+  remotes::install_github('satijalab/seurat-wrappers')
+  library(SeuratWrappers)
 
 
 
@@ -164,8 +168,7 @@
   # https://pubmed.ncbi.nlm.nih.gov/29948612/#:~:text=Cancer%20stem%20cells%20(CSCs)%2C,resistance%20to%20chemotherapy%20and%20radiation.
 
 
-  rm(meta_ori.df, meta_ann.df, meta.df, scRNA.SeuObj_Ori,
-     SingleRResult.lt, CTFeatures.SeuObj)
+  rm(meta_ori.df, scRNA.SeuObj_Ori, SingleRResult.lt)
   #### Save RData #####
   save.image(paste0(Save.Path,"/scRNA.SeuObj_CDS_PRJCA001063_Combine_Anno.RData"))
 
@@ -180,11 +183,53 @@
   # scRNA.SeuObj <- FindNeighbors(scRNA.SeuObj, reduction = "pca", dims = 1:10)
   # scRNA.SeuObj <- FindClusters(scRNA.SeuObj, resolution = 0.5)
 
-  rm(scRNA.SeuObj_1, scRNA.SeuObj_2, scRNA.SeuObj_3, scRNA.SeuObj_Ref,
-     scRNA.SeuObj_Ori, CTFeatures.SeuObj,SingleRResult.lt)
-
   #### Save RData #####
   save.image(paste0(Save.Path,"/scRNA.SeuObj_CDS_PRJCA001063_Combine_Anno_ReDR.RData"))
+
+
+
+##### Building trajectories with Monocle3 #####
+  ## https://satijalab.org/signac/articles/monocle.html
+  # remotes::install_github('satijalab/seurat-wrappers')
+  # library(SeuratWrappers)
+  #
+  library(monocle3)
+  scRNA.cds <- as.cell_data_set(scRNA.SeuObj)
+  scRNA.cds <- cluster_cells(cds = scRNA.cds, reduction_method = "UMAP")
+  scRNA.cds <- learn_graph(scRNA.cds, use_partition = TRUE)
+
+  scRNA.cds <- order_cells(scRNA.cds)
+
+  plot_cells(
+    cds = scRNA.cds,
+    color_cells_by = "pseudotime",
+    show_trajectory_graph = TRUE
+  )
+  plot_cells(scRNA.cds, color_cells_by = "partition")
+  plot_cells(scRNA.cds, color_cells_by = "Cell_type")
+
+  ## plot_genes_in_pseudotime
+  rowData(scRNA.cds)$gene_short_name <- scRNA.cds@assays@data@listData[["counts"]]@Dimnames[[1]]
+  Int_genes <- c("TOP2A", "NSUN2", "TP53","PTK2")
+  Int_lineage_cds <- scRNA.cds[rowData(scRNA.cds)$gene_short_name %in% Int_genes,]
+  plot_genes_in_pseudotime(Int_lineage_cds,
+                           color_cells_by="pseudotime",
+                           min_expr=0.5)
+
+  cds_sub <- choose_cells(scRNA.cds,clear_cds = F)
+
+
+  cds_sub <- choose_graph_segments(scRNA.cds,clear_cds = F)
+  Int_lineage_cds_sub <- cds_sub[rowData(cds_sub)$gene_short_name %in% Int_genes,]
+
+  plot_genes_in_pseudotime(Int_lineage_cds_sub,
+                           color_cells_by="pseudotime",
+                           min_expr=0.5)
+
+  #### Save RData #####
+  save.image(paste0(Save.Path,"/scRNA.SeuObj_CDS_PRJCA001063_Combine_Traj.RData"))
+
+
 
 ##### Export figures #####
   ## Export TIFF
