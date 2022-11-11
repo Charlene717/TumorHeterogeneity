@@ -11,16 +11,28 @@
 #### Load data #####
   load("D:/Dropbox/##_GitHub/#_scRNADataset/SeuratObject_CDS_PRJCA001063.RData")
   scRNA.SeuObj_1 <- scRNA.SeuObj
+  scRNA.SeuObj_1@meta.data$Type <- gsub("T","PT",scRNA.SeuObj_1@meta.data$Type)
+  scRNA.SeuObj_1@meta.data$Type <- gsub("N","Ctrl",scRNA.SeuObj_1@meta.data$Type)
+  scRNA.SeuObj_1_PT <- scRNA.SeuObj_1[,scRNA.SeuObj_1@meta.data$Type =="PT"]
+  scRNA.SeuObj_1_Ctrl <- scRNA.SeuObj_1[,scRNA.SeuObj_1@meta.data$Type =="Ctrl"]
+
 
   load("D:/Dropbox/##_GitHub/#_scRNADataset/SeuratObject_GSE131886_PDC_SC.RData")
   scRNA.SeuObj_2 <- scRNA.SeuObj
   DefaultAssay(scRNA.SeuObj_2) <- "RNA"
+  scRNA.SeuObj_2@meta.data$Type <- "Ctrl"
 
   load("D:/Dropbox/##_GitHub/#_scRNADataset/SeuratObject_GSE154778_PDAC_SC.RData")
   scRNA.SeuObj_3 <- scRNA.SeuObj
   DefaultAssay(scRNA.SeuObj_3) <- "RNA"
 
-  scRNA_SeuObj.list <- list(PRJCA001063 = scRNA.SeuObj_1,
+  # scRNA_SeuObj.list <- list(PRJCA001063 = scRNA.SeuObj_1,
+  #                           GSE131886 = scRNA.SeuObj_2,
+  #                           GSE154778 = scRNA.SeuObj_3)
+
+
+  scRNA_SeuObj.list <- list(PRJCA001063 = scRNA.SeuObj_1_PT,
+                            PRJCA001063 = scRNA.SeuObj_1_Ctrl,
                             GSE131886 = scRNA.SeuObj_2,
                             GSE154778 = scRNA.SeuObj_3)
 
@@ -110,35 +122,39 @@
   scRNA.SeuObj <- ScaleData(scRNA.SeuObj)
 
   ## PCA: Finding the right PCA conditions
-  scRNA.SeuObj <- RunPCA(scRNA.SeuObj, npcs = 200)
+  scRNA.SeuObj <- RunPCA(scRNA.SeuObj, npcs = 300)
   VizDimLoadings(scRNA.SeuObj, dims = 1:2, reduction = "pca")
   DimPlot(scRNA.SeuObj, reduction = "pca")
   DimHeatmap(scRNA.SeuObj, dims = 1, cells = 500, balanced = TRUE)
   DimHeatmap(scRNA.SeuObj, dims = 1:15, cells = 500, balanced = TRUE)
-  # Determine the ‘dimensionality’ of the dataset
+  # Determine the ???dimensionality??? of the dataset
     # NOTE: This process can take a long time for big datasets, comment out for expediency. More approximate techniques such as those implemented in ElbowPlot() can be used to reduce computation time
     pbmc <- scRNA.SeuObj
     pbmc <- JackStraw(pbmc, num.replicate = 100)
     pbmc <- ScoreJackStraw(pbmc, dims = 1:20)
     JackStrawPlot(pbmc, dims = 1:20)
-    ElbowPlot(pbmc, ndims = 200)
+    ElbowPlot(pbmc, ndims = 300)
 
   ## UMAP
-  scRNA.SeuObj <- RunUMAP(scRNA.SeuObj, reduction = "pca", dims = 1:150,n.neighbors = 20,min.dist = 0.3)
-  scRNA.SeuObj <- FindNeighbors(scRNA.SeuObj, reduction = "pca", dims = 1:150)
+  scRNA.SeuObj <- RunUMAP(scRNA.SeuObj, reduction = "pca", dims = 1:100,n.neighbors = 10,min.dist = 0.25)
+  scRNA.SeuObj <- FindNeighbors(scRNA.SeuObj, reduction = "pca", dims = 1:100)
   scRNA.SeuObj <- FindClusters(scRNA.SeuObj, resolution = 0.5)
 
   #### Save RData #####
-  save.image(paste0(Save.Path,"/scRNA.SeuObj_CDS_PRJCA001063_Combine_Ori.RData"))
-
+  # save.image(paste0(Save.Path,"/scRNA.SeuObj_CDS_PRJCA001063_Combine_Ori.RData"))
+  save.image(paste0(Save.Path,"/scRNA.SeuObj_CDS_PRJCA001063_Combine_ReBEC_Ori.RData"))
 
   ##### Plot #####
   FeaturePlot(scRNA.SeuObj, features = c("TOP2A"))
 
   # DimPlot(scRNA.SeuObj, reduction = "umap")
   DimPlot(scRNA.SeuObj, reduction = "umap",label = T)
-  DimPlot(scRNA.SeuObj, reduction = "umap",group.by = "Cell_type")
+
+  DimPlot(scRNA.SeuObj, reduction = "umap",group.by = "Type")
   DimPlot(scRNA.SeuObj, reduction = "umap",group.by = "DataSetID")
+
+  DimPlot(scRNA.SeuObj, reduction = "umap",group.by = "Cell_type")
+  DimPlot(scRNA.SeuObj, reduction = "umap", group.by = paste0("singleR_",SingleR_DE_method,"_",Remark) ,label = TRUE, pt.size = 0.5) + NoLegend()
 
 ##### Cell Type Annotation #####
   scRNA.SeuObj@meta.data[["DataSetID"]] %>% unique()
@@ -193,6 +209,7 @@
   # remotes::install_github('satijalab/seurat-wrappers')
   # library(SeuratWrappers)
   #
+  library(SeuratWrappers)
   library(monocle3)
   scRNA.cds <- as.cell_data_set(scRNA.SeuObj)
   scRNA.cds <- cluster_cells(cds = scRNA.cds, reduction_method = "UMAP")
@@ -204,13 +221,15 @@
     cds = scRNA.cds,
     color_cells_by = "pseudotime",
     show_trajectory_graph = TRUE
-  )
+  ) %>% BeautifyggPlot(.,LegPos = c(0.1, 0.15))
   plot_cells(scRNA.cds, color_cells_by = "partition")
   plot_cells(scRNA.cds, color_cells_by = "Cell_type")
 
   ## plot_genes_in_pseudotime
   rowData(scRNA.cds)$gene_short_name <- scRNA.cds@assays@data@listData[["counts"]]@Dimnames[[1]]
   Int_genes <- c("TOP2A", "NSUN2", "TP53","PTK2")
+  Int_genes <- c("C1R", "C3", "CEACAM5","CEACAM6", "CHI3L2", "FABP5", "HTRA1",
+                 "NNMT", "SERPINA1", "SPINK4", "TFF2", "TFF3")
   Int_lineage_cds <- scRNA.cds[rowData(scRNA.cds)$gene_short_name %in% Int_genes,]
   plot_genes_in_pseudotime(Int_lineage_cds,
                            color_cells_by="pseudotime",
