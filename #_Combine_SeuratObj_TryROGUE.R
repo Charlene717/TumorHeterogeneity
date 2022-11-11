@@ -5,51 +5,29 @@
   memory.limit(300000)
 
 ##### Load Packages #####
-  # if(!require("tidyverse")) install.packages("tidyverse")
-  # library(tidyverse)
+  source("FUN_Package_InstLoad.R")
+  FUN_Basic.set <- c("tidyverse","Seurat","ggplot2","ggpmisc",
+                     "stringr","magrittr","dplyr")
+  FUN_BiocManager.set <- c("fgsea","AnnotationHub","ensembldb",
+                           "SeuratDisk","monocle",
+                           "SingleR","scRNAseq","celldex","scran")
+  ## Set the desired organism
+  # organism = "org.Hs.eg.db" ## c("org.Hs.eg.db","org.Mm.eg.db","org.Dm.eg.db")
+  # c(organism,"fgsea")
 
-  #### Basic installation ####
-  Package.set <- c("tidyverse","Seurat","ggplot2","ggpmisc",
-                   "stringr","magrittr","dplyr")
-  ## Check whether the installation of those packages is required from basic
-  for (i in 1:length(Package.set)) {
-    if (!requireNamespace(Package.set[i], quietly = TRUE)){
-      install.packages(Package.set[i])
-    }
-  }
-  ## Load Packages
-  lapply(Package.set, library, character.only = TRUE)
-  rm(Package.set,i)
-
-  #### BiocManager installation ####
-  ## Check whether the installation of those packages is required from BiocManager
-  if (!require("BiocManager", quietly = TRUE))
-    install.packages("BiocManager")
-  Package.set <- c("fgsea","AnnotationHub","ensembldb",
-                   "SeuratDisk","monocle",
-                   "SingleR","scRNAseq","celldex","scran")
-  for (i in 1:length(Package.set)) {
-    if (!requireNamespace(Package.set[i], quietly = TRUE)){
-      BiocManager::install(Package.set[i])
-    }
-  }
-  ## Load Packages
-  lapply(Package.set, library, character.only = TRUE)
-  rm(Package.set,i)
-
-  options(stringsAsFactors = FALSE)
+  FUN_Package_InstLoad(Basic.set = FUN_Basic.set, BiocManager.set = FUN_BiocManager.set)
+  rm(FUN_Basic.set, FUN_BiocManager.set)
 
   #### GitHub installation ####
   if (!require("devtools", quietly = TRUE))
     install.packages("devtools")
-  library(monocle)
-  devtools::install_github("cole-trapnell-lab/garnett")
-  devtools::install_github('cole-trapnell-lab/monocle3')
-  devtools::install_github("LTLA/SingleR")
+  # library(monocle)
+  # devtools::install_github("cole-trapnell-lab/garnett")
+  # devtools::install_github('cole-trapnell-lab/monocle3')
+  #
+  # library(monocle3)
+  # library(garnett)
 
-  library(monocle3)
-  library(garnett)
-  # library(SingleR)
 
   if (!requireNamespace("devtools", quietly = TRUE)) install.packages("devtools")
   devtools::install_github("PaulingLiu/ROGUE")
