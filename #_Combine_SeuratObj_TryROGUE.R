@@ -1,4 +1,6 @@
 ## Ref: https://htmlpreview.github.io/?https://github.com/PaulingLiu/ROGUE/blob/master/vignettes/ROGUE_Tutorials.html
+## Ref: https://github.com/PaulingLiu/ROGUE
+## Ref: https://www.nature.com/articles/s41467-020-16904-3
 
 ##### Presetting ######
   rm(list = ls()) # Clean variable
@@ -21,18 +23,10 @@
   #### GitHub installation ####
   if (!require("devtools", quietly = TRUE))
     install.packages("devtools")
-  # library(monocle)
-  # devtools::install_github("cole-trapnell-lab/garnett")
-  # devtools::install_github('cole-trapnell-lab/monocle3')
-  #
-  # library(monocle3)
-  # library(garnett)
-
 
   if (!requireNamespace("devtools", quietly = TRUE)) install.packages("devtools")
   devtools::install_github("PaulingLiu/ROGUE")
   library(ROGUE)
-
 
 
 ##### Function setting #####
@@ -43,11 +37,9 @@
   source("FUN_Anno_SingleR.R")
 
 
-
 #### Load data #####
   # load("D:/Dropbox/##_GitHub/##_Charlene/TumorHeterogeneity/2022-08-01_Com_PDAC/scRNA.SeuObj_CDS_PRJCA001063_Combine_Anno_ReDR.RData")
   load("D:/Dropbox/##_GitHub/##_Charlene/TumorHeterogeneity/2022-11-08_Com_PDAC/SeuratObject_Com.RData")
-
 
 ##### Current path and new folder setting* #####
   ProjectName = "Com_ROGUE"
@@ -112,6 +104,7 @@
   ## Calculate the ROGUE value of each putative cluster for each sample
   rogue.res <- rogue(GeneExp.df, labels = Meta.data$celltype, samples = Meta.data$DataSetID, platform = "UMI", span = 0.6)
   rogue.res
+  rogue.boxplot(rogue.res)
 
   rogue.res2 <- rogue(GeneExp.df, labels = Meta.data$singleR_classic_PredbyscRNA2, samples = Meta.data$DataSetID, platform = "UMI", span = 0.6)
   rogue.res2
