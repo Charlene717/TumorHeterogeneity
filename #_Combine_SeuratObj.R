@@ -9,7 +9,7 @@
   library(Seurat)
 
 #### Load data #####
-  load("D:/Dropbox/##_GitHub/#_scRNADataset/SeuratObject_CDS_PRJCA001063.RData")
+  load("D:/Dropbox/#_Dataset/Cancer/PDAC/#_scRNA_SeuObj_PDAC_SC_CDS_PRJCA001063.RData")
   scRNA.SeuObj_1 <- scRNA.SeuObj
   scRNA.SeuObj_1@meta.data$Type <- gsub("T","PT",scRNA.SeuObj_1@meta.data$Type)
   scRNA.SeuObj_1@meta.data$Type <- gsub("N","Ctrl",scRNA.SeuObj_1@meta.data$Type)
@@ -17,12 +17,12 @@
   scRNA.SeuObj_1_Ctrl <- scRNA.SeuObj_1[,scRNA.SeuObj_1@meta.data$Type =="Ctrl"]
 
 
-  load("D:/Dropbox/##_GitHub/#_scRNADataset/SeuratObject_GSE131886_PDC_SC.RData")
+  load("D:/Dropbox/#_Dataset/Cancer/PDAC/#_scRNA_SeuObj_PDAC_SC_GSE131886.RData")
   scRNA.SeuObj_2 <- scRNA.SeuObj
   DefaultAssay(scRNA.SeuObj_2) <- "RNA"
   scRNA.SeuObj_2@meta.data$Type <- "Ctrl"
 
-  load("D:/Dropbox/##_GitHub/#_scRNADataset/SeuratObject_GSE154778_PDAC_SC.RData")
+  load("D:/Dropbox/#_Dataset/Cancer/PDAC/#_scRNA_SeuObj_PDAC_SC_GSE154778.RData")
   scRNA.SeuObj_3 <- scRNA.SeuObj
   DefaultAssay(scRNA.SeuObj_3) <- "RNA"
 
@@ -142,7 +142,9 @@
 
   #### Save RData #####
   # save.image(paste0(Save.Path,"/scRNA.SeuObj_CDS_PRJCA001063_Combine_Ori.RData"))
-  save.image(paste0(Save.Path,"/scRNA.SeuObj_CDS_PRJCA001063_Combine_ReBEC_Ori.RData"))
+  # save.image(paste0(Save.Path,"/scRNA.SeuObj_CDS_PRJCA001063_Combine_ReBEC_Ori.RData"))
+  save.image(paste0("D:/Dropbox/#_Dataset/Cancer/PDAC/",Sys.Date(),"_scRNA_SeuObj_PDAC_SC_Combine_ReBEC.RData"))
+
 
   ##### Plot #####
   FeaturePlot(scRNA.SeuObj, features = c("TOP2A"))
