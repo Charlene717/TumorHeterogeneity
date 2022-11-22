@@ -54,14 +54,9 @@
   ## Old version (Without normalizaiton) ## GeneExp.df <- scRNA.SeuObj@assays[["RNA"]]@counts %>% as.data.frame()
   GeneExp.df <- GetAssayData(scRNA.SeuObj, assay = "RNA", slot = "data") %>% as.data.frame() # normalized data matrix
 
-  ## Meta.data
-  # Cell annotation
-  Meta.data <- scRNA.SeuObj@meta.data
-  Meta.data <- data.frame(ID=row.names(Meta.data), Meta.data)
-
-
 ##### Run ROGUE #####
   ## Filtering out low-abundance genes and low-quality cells
+  GeneExp_Ori.df <- GeneExp.df
   GeneExp.df <- matr.filter(GeneExp.df, min.cells = 10, min.genes = 10)
 
   ## GeneExp.dfession entropy model
@@ -78,64 +73,175 @@
 
   ##### ************************************************************************ #####
   scRNA.SeuObj@meta.data$singleR_classic_PredbyscRNA2 <- scRNA.SeuObj@meta.data$singleR_classic_PredbyscRNA  %>% as.character()
-  TTT1 <- scRNA.SeuObj@meta.data
-  TTT_Ref <- scRNA.SeuObj_Ref@meta.data
-  TTT1[TTT1$CELL %in% TTT_Ref$CELL,]$singleR_classic_PredbyscRNA2 <- TTT_Ref$celltype %>% as.character()
-  scRNA.SeuObj@meta.data <- TTT1
+  Meta.df <- scRNA.SeuObj@meta.data
+  Meta_Ref.df <- scRNA.SeuObj_Ref@meta.data
+  Meta.df[Meta.df$CELL %in% Meta_Ref.df$CELL,]$singleR_classic_PredbyscRNA2 <- Meta_Ref.df$celltype %>% as.character()
+  scRNA.SeuObj@meta.data <- Meta.df
   scRNA.SeuObj@meta.data$singleR_classic_PredbyscRNA2 <- as.factor(scRNA.SeuObj@meta.data$singleR_classic_PredbyscRNA2)
-
+  rm(Meta.df,Meta_Ref.df)
 
   DimPlot(scRNA.SeuObj, reduction = "umap",group.by = "singleR_classic_PredbyscRNA2")
+  DimPlot(scRNA.SeuObj, reduction = "umap",group.by = "seurat_clusters")
+
   DimPlot(scRNA.SeuObj, reduction = "umap",group.by = "singleR_classic_PredbyscRNA")
-  DimPlot(scRNA.SeuObj, reduction = "umap",group.by = "celltype")
-  DimPlot(scRNA.SeuObj, reduction = "umap",group.by = "celltype")
 
-  ## Meta.data
-  # Cell annotation
-  Meta.data <- scRNA.SeuObj@meta.data
-  Meta.data <- data.frame(ID=row.names(Meta.data), Meta.data)
+  DimPlot(scRNA.SeuObj, reduction = "umap",group.by = "celltype")
+  DimPlot(scRNA.SeuObj_Ref, reduction = "umap",group.by = "celltype")
+
+  ## Extract Meta.data
+  Meta.df <- scRNA.SeuObj@meta.data
+  Meta.df <- data.frame(ID=row.names(Meta.df), Meta.df)
+
   ##### ************************************************************************ ####
+  # ### Try Ori celltype
+  # ## Calculate the ROGUE value of each putative cluster for each sample
+  # rogue.res <- rogue(GeneExp.df, labels = Meta.df$celltype, samples = Meta.df$DataSetID, platform = "UMI", span = 0.6)
+  # rogue.res
+  # rogue.boxplot(rogue.res)
+  #
+  # ## Visualize ROGUE values on a boxplot
+  # rogue.boxplot(rogue.res)
+  # P1 <- rogue.boxplot(rogue.res) + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+  # P1
 
 
-  ## Calculate the ROGUE value of each putative cluster for each sample
-  rogue.res <- rogue(GeneExp.df, labels = Meta.data$celltype, samples = Meta.data$DataSetID, platform = "UMI", span = 0.6)
-  rogue.res
-  rogue.boxplot(rogue.res)
-
-  rogue.res2 <- rogue(GeneExp.df, labels = Meta.data$singleR_classic_PredbyscRNA2, samples = Meta.data$DataSetID, platform = "UMI", span = 0.6)
-  rogue.res2
-  View(rogue.res2)
-  rogue.res2_2 <- rogue(GeneExp.df, labels = Meta.data$singleR_classic_PredbyscRNA2, samples = Meta.data$seurat_clusters, platform = "UMI", span = 0.6)
-  rogue.res2_2
-
-  rogue.res3_1 <- rogue(GeneExp.df, labels = Meta.data$seurat_clusters, samples = Meta.data$DataSetID, platform = "UMI", span = 0.6)
-  rogue.res3_1
-
-  rogue.res3_2 <- rogue(GeneExp.df, labels = Meta.data$seurat_clusters, samples = Meta.data$singleR_classic_PredbyscRNA2, platform = "UMI", span = 0.6)
-  rogue.res3_2
+  # #### DataSetID ####
+  # ## Calculate the ROGUE value of each putative cluster for each sample
+  # rogue_DataSetID.res <- rogue(GeneExp.df, labels = Meta.df$singleR_classic_PredbyscRNA2, samples = Meta.df$DataSetID, platform = "UMI", span = 0.6)
+  # rogue_DataSetID.res
+  # View(rogue_DataSetID.res)
+  #
+  # ## Visualize ROGUE values on a boxplot
+  # rogue.boxplot(rogue_DataSetID.res)
+  # P.DataSetID <- rogue.boxplot(rogue_DataSetID.res) + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+  # P.DataSetID
 
 
+  #### ROUGE of cell type by cluster ####
+  rogue_CT_CLU.res <- rogue(GeneExp.df, labels = Meta.df$singleR_classic_PredbyscRNA2, samples = Meta.df$seurat_clusters, platform = "UMI", span = 0.6)
+  rogue_CT_CLU.res
+  View(rogue_CT_CLU.res)
 
   ## Visualize ROGUE values on a boxplot
-  rogue.boxplot(rogue.res)
-  rogue.boxplot(rogue.res2)
-  P2 <- rogue.boxplot(rogue.res2) + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
-  P2
+  rogue.boxplot(rogue_CT_CLU.res)
+  P.CT_CLU.res <- rogue.boxplot(rogue_CT_CLU.res) + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+  P.CT_CLU.res
 
-  rogue.boxplot(rogue.res2_2)
-  P2_2 <- rogue.boxplot(rogue.res2_2) + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
-  P2_2
+  #### ROUGE of cluster by cell type ####
+  rogue_CLU_CT.res <- rogue(GeneExp.df, labels = Meta.df$seurat_clusters, samples = Meta.df$singleR_classic_PredbyscRNA2, platform = "UMI", span = 0.6)
+  rogue_CLU_CT.res
+  View(rogue_CLU_CT.res)
 
-  rogue.boxplot(rogue.res3_1)
-  P3_1 <- rogue.boxplot(rogue.res3_1) + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
-  P3_1
+  ## Visualize ROGUE values on a boxplot
+  rogue.boxplot(rogue_CLU_CT.res)
+  P.CLU_CT.res <- rogue.boxplot(rogue_CLU_CT.res) + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+  P.CLU_CT.res
 
-  rogue.boxplot(rogue.res3_2)
-  P3_2 <- rogue.boxplot(rogue.res3_2) + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
-  P3_2
+
+  #### ROUGE of cluster by Patients(SampleID) #### ## Take 30 min -> Too long
+  Meta.df$Patient <- Meta.df$SampleID
+  Meta_Ref.df <- scRNA.SeuObj_Ref@meta.data
+  Meta.df[Meta.df$CELL %in% Meta_Ref.df$CELL,]$Patient <- Meta_Ref.df$Patient
+  rm(Meta_Ref.df)
+
+  rogue_CLU_Samp.res <- rogue(GeneExp.df, labels = Meta.df$seurat_clusters, samples = Meta.df$Patient, platform = "UMI", span = 0.6)
+  rogue_CLU_Samp.res
+  View(rogue_CLU_Samp.res)
+
+  ## Visualize ROGUE values on a boxplot
+  rogue.boxplot(rogue_CLU_Samp.res)
+  P.CLU_Samp.res <- rogue.boxplot(rogue_CLU_Samp.res) + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+  P.CLU_Samp.res
+
+
+  ## ************************************************************************ ##
+  #### ROUGE of cluster by DataSetID #### ## Take 12 min
+  rogue_CLU_DataSetID.res <- rogue(GeneExp.df, labels = Meta.df$seurat_clusters, samples = Meta.df$DataSetID, platform = "UMI", span = 0.6)
+  rogue_CLU_DataSetID.res
+  View(rogue_CLU_DataSetID.res)
+
+  ## Visualize ROGUE values on a boxplot
+  rogue.boxplot(rogue_CLU_DataSetID.res)
+  P.CLU_DataSetID.res <- rogue.boxplot(rogue_CLU_DataSetID.res) + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+  P.CLU_DataSetID.res
+
+  # ## avg rouge
+  # av.rogue <- c()
+  # for (i in 1:ncol(rogue_CLU_DataSetID.res)) {
+  #   tmp.r <- rogue_CLU_DataSetID.res[,i]
+  #   tmp.r <- tmp.r[!is.na(tmp.r)]
+  #   av.rogue[i] <- mean(tmp.r)
+  # }
+
+  av.rogue <- mean(rogue_CLU_DataSetID.res[!is.na(rogue_CLU_DataSetID.res)])
+
+
+  #### Try Clustering Condition ####
+  scRNA.SeuObj_Test <- FindClusters(scRNA.SeuObj, resolution = 0.5)
+  DimPlot(scRNA.SeuObj_Test, reduction = "umap",group.by = "seurat_clusters")
+
+  scRNA.SeuObj_Test1 <- FindClusters(scRNA.SeuObj, resolution = 0.5)
+  DimPlot(scRNA.SeuObj_Test1, reduction = "umap",group.by = "seurat_clusters")
+
+  scRNA.SeuObj_Test2 <- FindClusters(scRNA.SeuObj, resolution = 0.8)
+  DimPlot(scRNA.SeuObj_Test2, reduction = "umap",group.by = "seurat_clusters")
+
+
+  ### Rogue_TryCond.df
+  Rogue_TryCond.df <- data.frame(matrix(data = NA ,nrow = 20,ncol = 3))
+  colnames(Rogue_TryCond.df) <- c("CondSet","ClusterNum","av.rogue")
+
+  for (i in seq(1:20)) {
+    scRNA.SeuObj_Temp <- FindClusters(scRNA.SeuObj, resolution = i*0.1)
+    Meta.df <- scRNA.SeuObj_Temp@meta.data
+
+    Rogue_TryCond.df$CondSet[i] <- i
+    Rogue_TryCond.df$ClusterNum[i] <- i*0.1
+
+    ## Rogue
+    rogue_Temp.res <- rogue(GeneExp.df, labels = Meta.df$singleR_classic_PredbyscRNA2, samples = Meta.df$seurat_clusters, platform = "UMI", span = 0.6)
+    av.rogue <- mean(rogue_Temp.res[!is.na(rogue_Temp.res)])
+    Rogue_TryCond.df$av.rogue[i] <- av.rogue
+
+    rm(scRNA.SeuObj_Temp, rogue_Temp.res, av.rogue)
+  }
+  rm(i)
+
+
+  ### Line plot
+  ## Ref: http://www.sthda.com/english/wiki/ggplot2-line-plot-quick-start-guide-r-software-and-data-visualization
+  # Rogue_TryCond.df$av.rogue <- c(0,0.01,0.02,0.03,0.05,0.06,0.07,0.08,0.09,0.1,0.11,0.12,0.13,0.14,0.15,0.16,0.17,0.18,0.19,0.2)
+  p <-ggplot(Rogue_TryCond.df, aes(x=ClusterNum, y=av.rogue)) +
+      geom_line(color="#9346b3", size=0.8)+
+      geom_point(color="#9346b3", size=2)+
+      theme_classic()
+
+    # geom_line(aes(color=CondSet))+
+    # geom_point(aes(color=CondSet))
+
+  p
+
+
+  Rogue_TryCond.df$av.slope.rogue <- NA
+  for (i in seq(1:20)) {
+    if(i==1){
+      Rogue_TryCond.df$av.slope.rogue[i] <- 0
+    }else{
+      Rogue_TryCond.df$av.slope.rogue[i] <- Rogue_TryCond.df$av.rogue[i]-Rogue_TryCond.df$av.rogue[i-1]
+    }
+
+  }
+
+  FinCondSet <- Rogue_TryCond.df[which(Rogue_TryCond.df$av.slope.rogue == max(Rogue_TryCond.df$av.slope.rogue)),]$CondSet
+  scRNA.SeuObj_Fin <- FindClusters(scRNA.SeuObj, resolution = FinCondSet*0.1)
+  DimPlot(scRNA.SeuObj_Fin, reduction = "umap",group.by = "seurat_clusters")
+
+
 
   ##### Save RData #####
   save.image(paste0("D:/Dropbox/#_Dataset/Cancer/PDAC/",ProjectName,"_ROGUE.RData"))
+
+
 
   # save.image(paste0(Save.Path,"/SeuratObject_",ProjectName,"_ROGUE.RData"))
 
