@@ -13,9 +13,6 @@
   FUN_BiocManager.set <- c("fgsea","AnnotationHub","ensembldb",
                            "SeuratDisk","monocle",
                            "SingleR","scRNAseq","celldex","scran")
-  ## Set the desired organism
-  # organism = "org.Hs.eg.db" ## c("org.Hs.eg.db","org.Mm.eg.db","org.Dm.eg.db")
-  # c(organism,"fgsea")
 
   FUN_Package_InstLoad(Basic.set = FUN_Basic.set, BiocManager.set = FUN_BiocManager.set)
   rm(FUN_Basic.set, FUN_BiocManager.set)
@@ -39,7 +36,8 @@
 
 #### Load data #####
   # load("D:/Dropbox/##_GitHub/##_Charlene/TumorHeterogeneity/2022-08-01_Com_PDAC/scRNA.SeuObj_CDS_PRJCA001063_Combine_Anno_ReDR.RData")
-  load("D:/Dropbox/##_GitHub/##_Charlene/TumorHeterogeneity/2022-11-08_Com_PDAC/SeuratObject_Com.RData")
+  # load("D:/Dropbox/##_GitHub/##_Charlene/TumorHeterogeneity/2022-11-08_Com_PDAC/SeuratObject_Com.RData")
+  load("D:/Dropbox/#_Dataset/Cancer/PDAC/2022-11-15_CTAnno_singleR_RefPRJCA001063_PDAC.RData")
 
 ##### Current path and new folder setting* #####
   ProjectName = "Com_ROGUE"
@@ -108,6 +106,7 @@
 
   rogue.res2 <- rogue(GeneExp.df, labels = Meta.data$singleR_classic_PredbyscRNA2, samples = Meta.data$DataSetID, platform = "UMI", span = 0.6)
   rogue.res2
+  View(rogue.res2)
   rogue.res2_2 <- rogue(GeneExp.df, labels = Meta.data$singleR_classic_PredbyscRNA2, samples = Meta.data$seurat_clusters, platform = "UMI", span = 0.6)
   rogue.res2_2
 
@@ -138,7 +137,9 @@
   P3_2
 
   ##### Save RData #####
-  save.image(paste0(Save.Path,"/SeuratObject_",ProjectName,"_ROGUE.RData"))
+  save.image(paste0("D:/Dropbox/#_Dataset/Cancer/PDAC/",ProjectName,"_ROGUE.RData"))
+
+  # save.image(paste0(Save.Path,"/SeuratObject_",ProjectName,"_ROGUE.RData"))
 
 # ####################################################################################################
 #
