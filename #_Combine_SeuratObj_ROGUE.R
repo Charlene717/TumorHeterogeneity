@@ -176,15 +176,15 @@
   av.rogue <- mean(rogue_CLU_DataSetID.res[!is.na(rogue_CLU_DataSetID.res)])
 
 
-  #### Try Clustering Condition ####
-  scRNA.SeuObj_Test <- FindClusters(scRNA.SeuObj, resolution = 0.5)
-  DimPlot(scRNA.SeuObj_Test, reduction = "umap",group.by = "seurat_clusters")
-
-  scRNA.SeuObj_Test1 <- FindClusters(scRNA.SeuObj, resolution = 0.5)
-  DimPlot(scRNA.SeuObj_Test1, reduction = "umap",group.by = "seurat_clusters")
-
-  scRNA.SeuObj_Test2 <- FindClusters(scRNA.SeuObj, resolution = 0.8)
-  DimPlot(scRNA.SeuObj_Test2, reduction = "umap",group.by = "seurat_clusters")
+  # #### Try Clustering Condition ####
+  # scRNA.SeuObj_Test <- FindClusters(scRNA.SeuObj, resolution = 0.5)
+  # DimPlot(scRNA.SeuObj_Test, reduction = "umap",group.by = "seurat_clusters")
+  #
+  # scRNA.SeuObj_Test1 <- FindClusters(scRNA.SeuObj, resolution = 0.5)
+  # DimPlot(scRNA.SeuObj_Test1, reduction = "umap",group.by = "seurat_clusters")
+  #
+  # scRNA.SeuObj_Test2 <- FindClusters(scRNA.SeuObj, resolution = 0.8)
+  # DimPlot(scRNA.SeuObj_Test2, reduction = "umap",group.by = "seurat_clusters")
 
 
   ### Rogue_TryCond.df
@@ -196,7 +196,8 @@
     Meta.df <- scRNA.SeuObj_Temp@meta.data
 
     Rogue_TryCond.df$CondSet[i] <- i
-    Rogue_TryCond.df$ClusterNum[i] <- i*0.1
+    # Rogue_TryCond.df$ClusterNum[i] <- i*0.1
+    Rogue_TryCond.df$ClusterNum[i] <- scRNA.SeuObj_Temp$seurat_clusters %>% unique() %>% length()
 
     ## Rogue
     rogue_Temp.res <- rogue(GeneExp.df, labels = Meta.df$singleR_classic_PredbyscRNA2, samples = Meta.df$seurat_clusters, platform = "UMI", span = 0.6)
