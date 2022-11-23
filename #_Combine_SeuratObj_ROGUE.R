@@ -200,7 +200,7 @@
     Rogue_TryCond.df$ClusterNum[i] <- scRNA.SeuObj_Temp$seurat_clusters %>% unique() %>% length()
 
     ## Rogue
-    rogue_Temp.res <- rogue(GeneExp.df, labels = Meta.df$singleR_classic_PredbyscRNA2, samples = Meta.df$seurat_clusters, platform = "UMI", span = 0.6)
+    rogue_Temp.res <- rogue(GeneExp.df, labels = Meta.df$seurat_clusters, samples = Meta.df$DataSetID, platform = "UMI", span = 0.6)
     av.rogue <- mean(rogue_Temp.res[!is.na(rogue_Temp.res)])
     Rogue_TryCond.df$av.rogue[i] <- av.rogue
 
@@ -219,7 +219,6 @@
 
     # geom_line(aes(color=CondSet))+
     # geom_point(aes(color=CondSet))
-
   p
 
 
