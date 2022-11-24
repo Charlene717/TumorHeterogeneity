@@ -187,22 +187,26 @@
   # DimPlot(scRNA.SeuObj_Test2, reduction = "umap",group.by = "seurat_clusters")
 
 
-  ### Rogue_TryCond.df
-  Rogue_TryCond.df <- data.frame(matrix(data = NA ,nrow = 20,ncol = 3))
-  colnames(Rogue_TryCond.df) <- c("CondSet","ClusterNum","av.rogue")
+  ### Rogue_TryCond_DataSet.df
+  Rogue_TryCond_DataSet.df <- data.frame(matrix(data = NA ,nrow = 20,ncol = 3))
+  colnames(Rogue_TryCond_DataSet.df) <- c("CondSet","ClusterNum","av.rogue")
 
   for (i in seq(1:20)) {
     scRNA.SeuObj_Temp <- FindClusters(scRNA.SeuObj, resolution = i*0.1)
     Meta.df <- scRNA.SeuObj_Temp@meta.data
+    Meta.df$Patient <- Meta.df$SampleID
+    Meta_Ref.df <- scRNA.SeuObj_Ref@meta.data
+    Meta.df[Meta.df$CELL %in% Meta_Ref.df$CELL,]$Patient <- Meta_Ref.df$Patient
+    rm(Meta_Ref.df)
 
-    Rogue_TryCond.df$CondSet[i] <- i
-    # Rogue_TryCond.df$ClusterNum[i] <- i*0.1
-    Rogue_TryCond.df$ClusterNum[i] <- scRNA.SeuObj_Temp$seurat_clusters %>% unique() %>% length()
+    Rogue_TryCond_DataSet.df$CondSet[i] <- i
+    # Rogue_TryCond_DataSet.df$ClusterNum[i] <- i*0.1
+    Rogue_TryCond_DataSet.df$ClusterNum[i] <- scRNA.SeuObj_Temp$seurat_clusters %>% unique() %>% length()
 
     ## Rogue
-    rogue_Temp.res <- rogue(GeneExp.df, labels = Meta.df$seurat_clusters, samples = Meta.df$DataSetID, platform = "UMI", span = 0.6)
+    rogue_Temp.res <- rogue(GeneExp.df, labels = Meta.df$seurat_clusters, samples = Meta.df$Patient, platform = "UMI", span = 0.6)
     av.rogue <- mean(rogue_Temp.res[!is.na(rogue_Temp.res)])
-    Rogue_TryCond.df$av.rogue[i] <- av.rogue
+    Rogue_TryCond_DataSet.df$av.rogue[i] <- av.rogue
 
     rm(scRNA.SeuObj_Temp, rogue_Temp.res, av.rogue)
   }
@@ -211,8 +215,8 @@
 
   ### Line plot
   ## Ref: http://www.sthda.com/english/wiki/ggplot2-line-plot-quick-start-guide-r-software-and-data-visualization
-  # Rogue_TryCond.df$av.rogue <- c(0,0.01,0.02,0.03,0.05,0.06,0.07,0.08,0.09,0.1,0.11,0.12,0.13,0.14,0.15,0.16,0.17,0.18,0.19,0.2)
-  p <-ggplot(Rogue_TryCond.df, aes(x=ClusterNum, y=av.rogue)) +
+  # Rogue_TryCond_DataSet.df$av.rogue <- c(0,0.01,0.02,0.03,0.05,0.06,0.07,0.08,0.09,0.1,0.11,0.12,0.13,0.14,0.15,0.16,0.17,0.18,0.19,0.2)
+  p <-ggplot(Rogue_TryCond_DataSet.df, aes(x=ClusterNum, y=av.rogue)) +
       geom_line(color="#9346b3", size=0.8)+
       geom_point(color="#9346b3", size=2)+
       theme_classic()
@@ -222,24 +226,24 @@
   p
 
 
-  Rogue_TryCond.df$av.slope.rogue <- NA
+  Rogue_TryCond_DataSet.df$av.slope.rogue <- NA
   for (i in seq(1:20)) {
     if(i==1){
-      Rogue_TryCond.df$av.slope.rogue[i] <- 0
+      Rogue_TryCond_DataSet.df$av.slope.rogue[i] <- 0
     }else{
-      Rogue_TryCond.df$av.slope.rogue[i] <- Rogue_TryCond.df$av.rogue[i]-Rogue_TryCond.df$av.rogue[i-1]
+      Rogue_TryCond_DataSet.df$av.slope.rogue[i] <- Rogue_TryCond_DataSet.df$av.rogue[i]-Rogue_TryCond_DataSet.df$av.rogue[i-1]
     }
 
   }
 
-  FinCondSet <- Rogue_TryCond.df[which(Rogue_TryCond.df$av.slope.rogue == max(Rogue_TryCond.df$av.slope.rogue)),]$CondSet
-  scRNA.SeuObj_Fin <- FindClusters(scRNA.SeuObj, resolution = FinCondSet*0.1)
-  DimPlot(scRNA.SeuObj_Fin, reduction = "umap",group.by = "seurat_clusters")
+  FinCondSet <- Rogue_TryCond_DataSet.df[which(Rogue_TryCond_DataSet.df$av.slope.rogue == max(Rogue_TryCond_DataSet.df$av.slope.rogue)),]$CondSet
+  scRNA_Fin.SeuObj <- FindClusters(scRNA.SeuObj, resolution = FinCondSet*0.1)
+  DimPlot(scRNA_Fin.SeuObj, reduction = "umap",group.by = "seurat_clusters")
 
 
 
   ##### Save RData #####
-  save.image(paste0("D:/Dropbox/#_Dataset/Cancer/PDAC/",ProjectName,"_ROGUE.RData"))
+  save.image(paste0("D:/Dropbox/#_Dataset/Cancer/PDAC/",ProjectName,"_ROGUE_byPatient.RData"))
 
 
 
