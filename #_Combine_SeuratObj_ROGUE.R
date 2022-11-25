@@ -209,7 +209,7 @@
     av.rogue <- mean(rogue_Temp.res[!is.na(rogue_Temp.res)])
     Rogue_TryCond_DataSet.df$av.rogue[i] <- av.rogue
 
-    rm(scRNA.SeuObj_Temp, rogue_Temp.res, av.rogue, CondSet_Res_Set )
+    rm(scRNA.SeuObj_Temp, rogue_Temp.res, av.rogue, CondSet_Res_Set,scRNA.SeuObj_Ref)
   }
   rm(i)
 
@@ -241,6 +241,12 @@
   scRNA_Fin.SeuObj <- FindClusters(scRNA.SeuObj, resolution = FinCondSet*0.1)
   DimPlot(scRNA_Fin.SeuObj, reduction = "umap",group.by = "seurat_clusters")
 
+
+  # ##### Redefine the cluster #####
+  # DimPlot(scRNA.SeuObj, reduction = "umap",group.by = "singleR_classic_PredbyscRNA2")
+  # DimPlot(scRNA.SeuObj, reduction = "umap",group.by = "seurat_clusters")
+  # scRNA.SeuObj$celltype_Sub <- paste0(scRNA.SeuObj$singleR_classic_PredbyscRNA2,"_",scRNA.SeuObj$seurat_clusters)
+  # DimPlot(scRNA.SeuObj, reduction = "umap",group.by = "celltype_Sub")
 
 
   ##### Save RData #####
