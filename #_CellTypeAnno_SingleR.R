@@ -38,10 +38,10 @@ CTFeatures.SeuObj <- scRNA.SeuObj_Ref
 ##### Current path and new folder setting* #####
 ProjectName = paste0("CTAnno_singleR_RefPRJCA001063")
 Sampletype = "PDAC"
-#ProjSamp.Path = paste0(Sampletype,"_",ProjectName)
 
 Version = paste0(Sys.Date(),"_",ProjectName,"_",Sampletype)
 Save.Path = paste0(getwd(),"/",Version)
+
 ## Create new folder
 if (!dir.exists(Save.Path)){
   dir.create(Save.Path)
@@ -57,8 +57,8 @@ SingleR_DE_method <- "classic"
 
 
 ##### Set References #####
-if(RefType == "BuiltIn_celldex"){
-  #### Database: Bulk reference setting for Cell type features ####
+if(RefType == "BuiltIn_celldex") ## Database: Bulk reference setting for Cell type features
+{
   library(celldex)
 
   if(celldexDatabase == "BlueprintEncodeData"){
@@ -79,13 +79,13 @@ if(RefType == "BuiltIn_celldex"){
     print("Error in database setting!")
   }
 
-
   #### Demo dataset ####
   # library(celldex)
   # hpca.se <- HumanPrimaryCellAtlasData()
   # hpca.se
-}else if(RefType =="BuiltIn_scRNA"){
-  #### single-cell reference setting for Cell type features ####
+
+}else if(RefType =="BuiltIn_scRNA")   ##single-cell reference setting for Cell type features
+{
   ## Prepossessing
   CTFeatures <- as.SingleCellExperiment(CTFeatures.SeuObj)
   CTFeatures$label <- CTFeatures@colData@listData[["Cell_type"]]
@@ -96,17 +96,14 @@ if(RefType == "BuiltIn_celldex"){
   #### Demo dataset ####
   # library(scRNAseq)
   # sceM <- MuraroPancreasData()
-  #
-  # # One should normally do cell-based quality control at this point, but for
-  # # brevity's sake, we will just remove the unlabelled libraries here.
-  # sceM <- sceM[,!is.na(sceM$label)]
-  #
-  # # SingleR() expects reference datasets to be normalized and log-transformed.
+  # sceM <- sceM[,!is.na(sceM$label)] # One should normally do cell-based quality control at this point, but for brevity's sake, we will just remove the unlabelled libraries here.
   # library(scuttle)
-  # sceM <- logNormCounts(sceM)
+  # sceM <- logNormCounts(sceM) # SingleR() expects reference datasets to be normalized and log-transformed.
 
 }
 
+
+################  To be completed  ################
 # #########################################################################################################
 # ##### Combine scRNA-seq and Bulk as Ref #####
 # CTFeatures_Ori <- CTFeatures
@@ -134,35 +131,29 @@ if(RefType == "BuiltIn_celldex"){
 
 #########################################################################################################
 
-
-
 ##### Set Target SeuObj #####
 ## Prepossessing
 scRNA <- as.SingleCellExperiment(scRNA.SeuObj)
-#### Demo dataset ####
-# library(scRNAseq)
-# hESCs <- LaMannoBrainData('human-es')
-# hESCs <- hESCs[,colSums(counts(hESCs)) > 0] # Remove libraries with no counts.
-# hESCs <- logNormCounts(hESCs)
-# hESCs <- hESCs[,1:100]
 
 #### Run SingleR ####
 library(SingleR)
-if(RefType == "BuiltIn_celldex"){
+if(RefType == "BuiltIn_celldex")
+{
   SingleR.lt <- SingleR(test = scRNA, ref = CTFeatures, assay.type.test=1,
                         labels = CTFeatures$label.main , de.method= SingleR_DE_method)#, de.method="wilcox") #  de.method = c("classic", "wilcox", "t")
 
-}else if(RefType =="BuiltIn_scRNA"){
+}else if(RefType =="BuiltIn_scRNA")
+{
   SingleR.lt <- SingleR(test = scRNA, ref = CTFeatures, assay.type.test=1,
                         labels = CTFeatures$label , de.method= SingleR_DE_method)#, de.method="wilcox") #  de.method = c("classic", "wilcox", "t")
 }
 
 SingleR.lt
 
-# Summarizing the distribution:
-CTCount_byCTDB.df <- table(SingleR.lt$labels) %>%
+## Summarizing the distribution:
+table(SingleR.lt$labels) %>%
   as.data.frame() %>%
-  dplyr::rename(Cell_Type = Var1, Count = Freq)
+  dplyr::rename(Cell_Type = Var1, Count = Freq) -> CTCount_byCTDB.df
 
 ##### Annotation diagnostics #####
 p.ScoreHeatmap1 <- plotScoreHeatmap(SingleR.lt)
@@ -183,8 +174,7 @@ scRNA@colData@listData[[paste0("labels_",SingleR_DE_method,"_",Remark)]] <- Sing
 
 # # Endothelial cell-related markers
 # library(scater)
-# plotHeatmap(scRNA, order_columns_by="labels",
-#             features = unique(unlist(all.markers[["Endothelial_cells"]])))
+# plotHeatmap(scRNA, order_columns_by="labels", features = unique(unlist(all.markers[["Endothelial_cells"]])))
 
 
 
@@ -237,8 +227,6 @@ dev.off()
 sessionInfo()
 ## Ref: https://stackoverflow.com/questions/21967254/how-to-write-a-reader-friendly-sessioninfo-to-text-file
 writeLines(capture.output(sessionInfo()), paste0(Save.Path,"/sessionInfo.txt"))
-
-
 
 ##### Save RData #####
 # save.image(paste0("D:/Dropbox/#_Dataset/Cancer/PDAC/",Sys.Date(),"_SeuratObject_",ProjectName,".RData"))
