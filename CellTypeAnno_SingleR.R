@@ -2,26 +2,74 @@
 ## Example Ref: https://bioconductor.org/packages/devel/bioc/vignettes/SingleR/inst/doc/SingleR.html
 
 ##### Presetting ######
-  rm(list = ls()) # Clean variable
-  memory.limit(300000)
+rm(list = ls()) # Clean variable
+memory.limit(300000)
 
 
 ##### Load Packages #####
-  if(!require("tidyverse")) install.packages("tidyverse")
-  library(tidyverse)
+if(!require("tidyverse")) install.packages("tidyverse")
+library(tidyverse)
 
-  #### Basic and BiocManager installation ####
-  source("FUN_Package_InstLoad.R")
-  FUN_Basic.set <- c("tidyverse","Seurat","ggpubr")
-  FUN_BiocManager.set <- c("SingleR","scRNAseq","celldex","scran","scater","scuttle")
+#### Basic and BiocManager installation ####
+source("FUN_Package_InstLoad.R")
+FUN_Basic.set <- c("tidyverse","Seurat","ggpubr")
+FUN_BiocManager.set <- c("SingleR","scRNAseq","celldex","scran","scater","scuttle")
 
-  FUN_Package_InstLoad(Basic.set = FUN_Basic.set, BiocManager.set = FUN_BiocManager.set)
-  rm(FUN_Basic.set, FUN_BiocManager.set)
+FUN_Package_InstLoad(Basic.set = FUN_Basic.set, BiocManager.set = FUN_BiocManager.set)
+rm(FUN_Basic.set, FUN_BiocManager.set)
 
 
 ##### Function setting #####
-  ## Call function
-  source("FUN_Anno_SingleR.R", encoding="UTF-8")
+## Call function
+source("FUN_Anno_SingleR.R", encoding="UTF-8")
+
+#### Load data #####
+## Load all
+load("D:/Dropbox/#_Dataset/Cancer/PDAC/2022-11-15_scRNA_SeuObj_PDAC_SC_Combine_ReBEC.RData")
+
+## Set Ref
+scRNA.SeuObj_Ref <- scRNA.SeuObj[,scRNA.SeuObj$DataSetID %in% "PRJCA001063"]
+CTFeatures.SeuObj <- scRNA.SeuObj_Ref
+
+## Set Tar
+# scRNA.SeuObj_Ref
+
+
+##### Parameter setting* #####
+# Remark1 <- "PredbyscRNA" # c("PredbyCTDB","PredbyscRNA")
+RefType <- "BuiltIn_scRNA" # c("BuiltIn_celldex","BuiltIn_scRNA")
+celldexDatabase <- "HumanPrimaryCellAtlasData"
+# c("BlueprintEncodeData","DatabaseImmuneCellExpressionData","HumanPrimaryCellAtlasData","ImmGenData",
+#   "MonacoImmuneData","MouseRNAseqData","NovershternHematopoieticData")
+de.method <- "classic"
+
+## Parameter of classifySingleR
+quantile = 0.8
+tune.thresh = 0.05
+sd.thresh = 1
+
+Remark <- paste0(Remark1,"_",de.method,"_",
+                 "qua",quantile,"_tun",tune.thresh,"_sd",sd.thresh)
+
+SmallTest = F
+
+
+
+#####  #####
+if(SmallTest == TRUE){
+  ## SeuObj_Ref for small test
+  # CTFeatures.SeuObj <- scRNA.SeuObj_Ref[,scRNA.SeuObj_Ref$CELL %in% sample(scRNA.SeuObj_Ref$CELL,1000)] ## For small test
+  CTFeatures.SeuObj <- scRNA.SeuObj_Ref[,scRNA.SeuObj_Ref@meta.data[[1]] %in% sample(scRNA.SeuObj_Ref@meta.data[[1]],1000)] ## For small test
+  ## SeuObj_Tar for small test
+  # scRNA.SeuObj <- scRNA.SeuObj[,scRNA.SeuObj$CELL %in% sample(scRNA.SeuObj$CELL,1000)] ## For small test
+  scRNA.SeuObj <- scRNA.SeuObj[,scRNA.SeuObj@meta.data[[1]] %in% sample(scRNA.SeuObj@meta.data[[1]],1000)] ## For small test
+}else{
+  ## SeuObj_Ref for full data
+  CTFeatures.SeuObj <- scRNA.SeuObj_Ref
+}
+
+
+
 
 ##### Current path and new folder setting* #####
   ProjectName_Ano = paste0("CTAnno_singleR_PRJCA001063S")
@@ -34,41 +82,6 @@
   #   dir.create(Save.Path)
   # }
 
-##### Parameter setting* #####
-  # Remark1 <- "PredbyscRNA" # c("PredbyCTDB","PredbyscRNA")
-  RefType <- "BuiltIn_scRNA" # c("BuiltIn_celldex","BuiltIn_scRNA")
-  celldexDatabase <- "HumanPrimaryCellAtlasData"
-  # c("BlueprintEncodeData","DatabaseImmuneCellExpressionData","HumanPrimaryCellAtlasData","ImmGenData",
-  #   "MonacoImmuneData","MouseRNAseqData","NovershternHematopoieticData")
-  de.method <- "classic"
-
-  ## Parameter of classifySingleR
-  quantile = 0.8
-  tune.thresh = 0.05
-  sd.thresh = 1
-
-  Remark <- paste0(Remark1,"_",de.method,"_",
-                   "qua",quantile,"_tun",tune.thresh,"_sd",sd.thresh)
-
-  SmallTest = F
-
-#### Load data #####
-  # load("SeuratObject_CDS_PRJCA001063.RData")
-
-  ## SeuObj_Ref
-#  scRNA.SeuObj_Ref <- scRNA.SeuObj
-
-  if(SmallTest == TRUE){
-    ## SeuObj_Ref for small test
-    # CTFeatures.SeuObj <- scRNA.SeuObj_Ref[,scRNA.SeuObj_Ref$CELL %in% sample(scRNA.SeuObj_Ref$CELL,1000)] ## For small test
-    CTFeatures.SeuObj <- scRNA.SeuObj_Ref[,scRNA.SeuObj_Ref@meta.data[[1]] %in% sample(scRNA.SeuObj_Ref@meta.data[[1]],1000)] ## For small test
-    ## SeuObj_Tar for small test
-    # scRNA.SeuObj <- scRNA.SeuObj[,scRNA.SeuObj$CELL %in% sample(scRNA.SeuObj$CELL,1000)] ## For small test
-    scRNA.SeuObj <- scRNA.SeuObj[,scRNA.SeuObj@meta.data[[1]] %in% sample(scRNA.SeuObj@meta.data[[1]],1000)] ## For small test
-  }else{
-    ## SeuObj_Ref for full data
-    CTFeatures.SeuObj <- scRNA.SeuObj_Ref
-  }
 
 
 ##### Run singleR #####
