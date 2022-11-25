@@ -5,6 +5,19 @@
 rm(list = ls()) # Clean variable
 memory.limit(300000)
 
+#### Load data #####
+## Load all
+load("D:/Dropbox/#_Dataset/Cancer/PDAC/2022-11-15_scRNA_SeuObj_PDAC_SC_Combine_ReBEC.RData")
+## Clean up the object
+rm(list=setdiff(ls(), c("scRNA.SeuObj")))
+
+## Set Ref
+scRNA.SeuObj_Ref <- scRNA.SeuObj[,scRNA.SeuObj$DataSetID %in% "PRJCA001063"]
+CTFeatures.SeuObj <- scRNA.SeuObj_Ref
+
+## Set Tar
+# scRNA.SeuObj_Ref
+
 
 ##### Load Packages #####
 if(!require("tidyverse")) install.packages("tidyverse")
@@ -23,18 +36,6 @@ rm(FUN_Basic.set, FUN_BiocManager.set)
 ## Call function
 source("FUN_Anno_SingleR.R", encoding="UTF-8")
 
-#### Load data #####
-## Load all
-load("D:/Dropbox/#_Dataset/Cancer/PDAC/2022-11-15_scRNA_SeuObj_PDAC_SC_Combine_ReBEC.RData")
-
-## Set Ref
-scRNA.SeuObj_Ref <- scRNA.SeuObj[,scRNA.SeuObj$DataSetID %in% "PRJCA001063"]
-CTFeatures.SeuObj <- scRNA.SeuObj_Ref
-
-## Set Tar
-# scRNA.SeuObj_Ref
-
-
 ##### Current path and new folder setting* #####
 ProjectName = paste0("CTAnno_singleR_RefPRJCA001063")
 Sampletype = "PDAC"
@@ -43,9 +44,7 @@ Version = paste0(Sys.Date(),"_",ProjectName,"_",Sampletype)
 Save.Path = paste0(getwd(),"/",Version)
 
 ## Create new folder
-if (!dir.exists(Save.Path)){
-  dir.create(Save.Path)
-}
+if (!dir.exists(Save.Path)){ dir.create(Save.Path) }
 
 ##### Parameter setting* #####
 Remark = "PredbyscRNA" # c("PredbyCTDB","PredbyscRNA")
@@ -131,11 +130,12 @@ if(RefType == "BuiltIn_celldex") ## Database: Bulk reference setting for Cell ty
 
 #########################################################################################################
 
-##### Set Target SeuObj #####
+##### Run SingleR #####
+## Set Target SeuObj
 ## Prepossessing
 scRNA <- as.SingleCellExperiment(scRNA.SeuObj)
 
-#### Run SingleR ####
+## Run SingleR
 library(SingleR)
 if(RefType == "BuiltIn_celldex")
 {
@@ -155,13 +155,27 @@ table(SingleR.lt$labels) %>%
   as.data.frame() %>%
   dplyr::rename(Cell_Type = Var1, Count = Freq) -> CTCount_byCTDB.df
 
-##### Annotation diagnostics #####
+#### Annotation diagnostics ####
+## Plot Heatmap
 p.ScoreHeatmap1 <- plotScoreHeatmap(SingleR.lt)
 p.ScoreHeatmap1
 p.DeltaDist1 <- plotDeltaDistribution(SingleR.lt, ncol = 3)
 p.DeltaDist1
 summary(is.na(SingleR.lt$pruned.labels))
 
+## Plot UMAP
+scRNA.SeuObj@meta.data[[paste0("singleR_",SingleR_DE_method,"_",Remark)]]<- SingleR.lt$labels # scRNA.SeuObj$singleRPredbyCTDB <- SingleR.lt$labels
+p.CTPred1 <- DimPlot(scRNA.SeuObj, reduction = "umap", group.by = paste0("singleR_",SingleR_DE_method,"_",Remark) ,label = TRUE, pt.size = 0.5) + NoLegend()
+p.CTPred1
+p.CT1 <- DimPlot(scRNA.SeuObj, reduction = "umap", group.by ="Cell_type" ,label = TRUE, pt.size = 0.5) + NoLegend()
+p.CT1
+
+library(ggpubr)
+p.CTComp1 <- ggarrange(p.CT1, p.CTPred1, common.legend = TRUE, legend = "top")
+p.CTComp1
+
+##### Export result #####
+## Export PDF
 pdf(file = paste0(Save.Path,"/",ProjectName,"_",Remark,"_AnnoDiag.pdf"),
     width = 10,  height = 7
 )
@@ -177,7 +191,6 @@ scRNA@colData@listData[[paste0("labels_",SingleR_DE_method,"_",Remark)]] <- Sing
 # plotHeatmap(scRNA, order_columns_by="labels", features = unique(unlist(all.markers[["Endothelial_cells"]])))
 
 
-
 pdf(file = paste0(Save.Path,"/",ProjectName,"_",Remark,"_HeatmapCTmarkers.pdf"),
     width = 12,  height = 7
 )
@@ -188,25 +201,11 @@ for (i in 1:length(all.markers)) {
 dev.off()
 
 
-
-
-## Plot UMAP
-scRNA.SeuObj@meta.data[[paste0("singleR_",SingleR_DE_method,"_",Remark)]]<- SingleR.lt$labels # scRNA.SeuObj$singleRPredbyCTDB <- SingleR.lt$labels
-p.CTPred1 <- DimPlot(scRNA.SeuObj, reduction = "umap", group.by = paste0("singleR_",SingleR_DE_method,"_",Remark) ,label = TRUE, pt.size = 0.5) + NoLegend()
-p.CTPred1
-p.CT1 <- DimPlot(scRNA.SeuObj, reduction = "umap", group.by ="Cell_type" ,label = TRUE, pt.size = 0.5) + NoLegend()
-p.CT1
-
-library(ggpubr)
-p.CTComp1 <- ggarrange(p.CT1, p.CTPred1, common.legend = TRUE, legend = "top")
-p.CTComp1
-
 pdf(file = paste0(Save.Path,"/",ProjectName,"_",Remark,"_CompareCTUMAP.pdf"),
     width = 12,  height = 7
 )
 p.CTComp1 %>% print()
 dev.off()
-
 
 
 pdf(file = paste0(Save.Path,"/",ProjectName,"_",Remark,"_CompareCTUMAP.pdf"),
@@ -219,8 +218,6 @@ library(ggsci)
 p.CTPred1 + scale_color_npg() + coord_fixed(ratio = 1) + theme(legend.position = c(1, 0.5))
 
 dev.off()
-
-
 
 
 ##### Session information #####
