@@ -242,12 +242,17 @@
   DimPlot(scRNA_Fin.SeuObj, reduction = "umap",group.by = "seurat_clusters")
 
 
-  # ##### Redefine the cluster #####
-  # DimPlot(scRNA.SeuObj, reduction = "umap",group.by = "singleR_classic_PredbyscRNA2")
-  # DimPlot(scRNA.SeuObj, reduction = "umap",group.by = "seurat_clusters")
-  # scRNA.SeuObj$celltype_Sub <- paste0(scRNA.SeuObj$singleR_classic_PredbyscRNA2,"_",scRNA.SeuObj$seurat_clusters)
-  # DimPlot(scRNA.SeuObj, reduction = "umap",group.by = "celltype_Sub")
+  ##### Redefine the cluster #####
+  DimPlot(scRNA.SeuObj, reduction = "umap",group.by = "singleR_classic_PredbyscRNA2")
+  DimPlot(scRNA.SeuObj, reduction = "umap",group.by = "seurat_clusters")
+  scRNA.SeuObj$celltype_Sub <- paste0(scRNA.SeuObj$singleR_classic_PredbyscRNA2,"_",scRNA.SeuObj$seurat_clusters)
+  DimPlot(scRNA.SeuObj, reduction = "umap",group.by = "celltype_Sub")
 
+  ## Sub celltype
+  scRNA_Duc2.SeuObj <- scRNA.SeuObj[,grepl("Duc",scRNA.SeuObj$singleR_classic_PredbyscRNA2)]
+  DimPlot(scRNA_Duc2.SeuObj, reduction = "umap",group.by = "singleR_classic_PredbyscRNA2")
+  DimPlot(scRNA_Duc2.SeuObj, reduction = "umap",group.by = "seurat_clusters")
+  scRNA_Duc2.SeuObj <- FindClusters(scRNA_Duc2.SeuObj, resolution = CondSet_Res_Set )
 
   ##### Save RData #####
   save.image(paste0("D:/Dropbox/#_Dataset/Cancer/PDAC/",Version,"_ROGUE_byPatient.RData"))
