@@ -189,17 +189,18 @@
 
   ### Rogue_TryCond_DataSet.df
   Rogue_TryCond_DataSet.df <- data.frame(matrix(data = NA ,nrow = 20,ncol = 3))
-  colnames(Rogue_TryCond_DataSet.df) <- c("CondSet","ClusterNum","av.rogue")
+  colnames(Rogue_TryCond_DataSet.df) <- c("CondSet_Res","ClusterNum","av.rogue")
 
   for (i in seq(1:20)) {
-    scRNA.SeuObj_Temp <- FindClusters(scRNA.SeuObj, resolution = i*0.1)
+    CondSet_Res_Set <- i*0.01
+    scRNA.SeuObj_Temp <- FindClusters(scRNA.SeuObj, resolution = CondSet_Res_Set )
     Meta.df <- scRNA.SeuObj_Temp@meta.data
     Meta.df$Patient <- Meta.df$SampleID
     Meta_Ref.df <- scRNA.SeuObj_Ref@meta.data
     Meta.df[Meta.df$CELL %in% Meta_Ref.df$CELL,]$Patient <- Meta_Ref.df$Patient
     rm(Meta_Ref.df)
 
-    Rogue_TryCond_DataSet.df$CondSet[i] <- i
+    Rogue_TryCond_DataSet.df$CondSet_Res[i] <- CondSet_Res_Set
     # Rogue_TryCond_DataSet.df$ClusterNum[i] <- i*0.1
     Rogue_TryCond_DataSet.df$ClusterNum[i] <- scRNA.SeuObj_Temp$seurat_clusters %>% unique() %>% length()
 
@@ -208,7 +209,7 @@
     av.rogue <- mean(rogue_Temp.res[!is.na(rogue_Temp.res)])
     Rogue_TryCond_DataSet.df$av.rogue[i] <- av.rogue
 
-    rm(scRNA.SeuObj_Temp, rogue_Temp.res, av.rogue)
+    rm(scRNA.SeuObj_Temp, rogue_Temp.res, av.rogue, CondSet_Res_Set )
   }
   rm(i)
 
