@@ -13,7 +13,6 @@ rm(list=setdiff(ls(), c("scRNA.SeuObj")))
 
 ## Set Ref
 scRNA.SeuObj_Ref <- scRNA.SeuObj[,scRNA.SeuObj$DataSetID %in% "PRJCA001063"]
-CTFeatures.SeuObj <- scRNA.SeuObj_Ref
 
 ## Set Tar
 # scRNA.SeuObj_Ref
@@ -86,11 +85,11 @@ if(RefType == "BuiltIn_celldex") ## Database: Bulk reference setting for Cell ty
 }else if(RefType =="BuiltIn_scRNA")   ##single-cell reference setting for Cell type features
 {
   ## Prepossessing
-  CTFeatures <- as.SingleCellExperiment(CTFeatures.SeuObj)
+  CTFeatures <- as.SingleCellExperiment(scRNA.SeuObj_Ref)
   CTFeatures$label <- CTFeatures@colData@listData[["Cell_type"]]
   CTFeatures <- CTFeatures[,!is.na(CTFeatures$label)]
   # CTFeatures <- logNormCounts(CTFeatures)
-  #rm(CTFeatures.SeuObj)
+  #rm(scRNA.SeuObj_Ref)
 
   #### Demo dataset ####
   # library(scRNAseq)
@@ -174,6 +173,19 @@ library(ggpubr)
 p.CTComp1 <- ggarrange(p.CT1, p.CTPred1, common.legend = TRUE, legend = "top")
 p.CTComp1
 
+## Renew Meta.data
+scRNA.SeuObj@meta.data$singleR_classic_PredbyscRNA2 <- scRNA.SeuObj@meta.data$singleR_classic_PredbyscRNA  %>% as.character()
+Meta.data_Temp <- scRNA.SeuObj@meta.data
+Meta.data_Ref_Temp <- scRNA.SeuObj_Ref@meta.data
+Meta.data_Temp[Meta.data_Temp$CELL %in% Meta.data_Ref_Temp$CELL,]$singleR_classic_PredbyscRNA2 <- Meta.data_Ref_Temp$celltype %>% as.character()
+scRNA.SeuObj@meta.data <- Meta.data_Temp
+
+DimPlot(scRNA.SeuObj, reduction = "umap",group.by = "singleR_classic_PredbyscRNA2")
+DimPlot(scRNA.SeuObj, reduction = "umap",group.by = "singleR_classic_PredbyscRNA")
+DimPlot(scRNA.SeuObj, reduction = "umap",group.by = "celltype")
+DimPlot(scRNA.SeuObj, reduction = "umap",group.by = "Type")
+
+
 ##### Export result #####
 ## Export PDF
 pdf(file = paste0(Save.Path,"/",ProjectName,"_",Remark,"_AnnoDiag.pdf"),
@@ -226,23 +238,10 @@ sessionInfo()
 writeLines(capture.output(sessionInfo()), paste0(Save.Path,"/sessionInfo.txt"))
 
 ##### Save RData #####
+rm(scRNA)
 # save.image(paste0("D:/Dropbox/#_Dataset/Cancer/PDAC/",Sys.Date(),"_SeuratObject_",ProjectName,".RData"))
 save.image(paste0("D:/Dropbox/#_Dataset/Cancer/PDAC/",Version,".RData"))
 
-
-##### ************************************************************************ #####
-scRNA.SeuObj@meta.data$singleR_classic_PredbyscRNA2 <- scRNA.SeuObj@meta.data$singleR_classic_PredbyscRNA  %>% as.character()
-TTT1 <- scRNA.SeuObj@meta.data
-TTT_Ref <- scRNA.SeuObj_Ref@meta.data
-TTT1[TTT1$CELL %in% TTT_Ref$CELL,]$singleR_classic_PredbyscRNA2 <- TTT_Ref$celltype %>% as.character()
-scRNA.SeuObj@meta.data <- TTT1
-
-DimPlot(scRNA.SeuObj, reduction = "umap",group.by = "singleR_classic_PredbyscRNA2")
-DimPlot(scRNA.SeuObj, reduction = "umap",group.by = "singleR_classic_PredbyscRNA")
-DimPlot(scRNA.SeuObj, reduction = "umap",group.by = "celltype")
-DimPlot(scRNA.SeuObj, reduction = "umap",group.by = "Type")
-
-##### ************************************************************************ #####
 
 
 # ## 20221113 ##
