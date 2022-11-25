@@ -164,7 +164,7 @@ p.DeltaDist1
 summary(is.na(SingleR.lt$pruned.labels))
 
 ## Plot UMAP
-scRNA.SeuObj@meta.data[[paste0("singleR_",SingleR_DE_method,"_",Remark)]]<- SingleR.lt$labels # scRNA.SeuObj$singleRPredbyCTDB <- SingleR.lt$labels
+scRNA.SeuObj@meta.data[[paste0("singleR_",SingleR_DE_method,"_",Remark)]] <- SingleR.lt$labels # scRNA.SeuObj$singleRPredbyCTDB <- SingleR.lt$labels
 p.CTPred1 <- DimPlot(scRNA.SeuObj, reduction = "umap", group.by = paste0("singleR_",SingleR_DE_method,"_",Remark) ,label = TRUE, pt.size = 0.5) + NoLegend()
 p.CTPred1
 p.CT1 <- DimPlot(scRNA.SeuObj, reduction = "umap", group.by ="Cell_type" ,label = TRUE, pt.size = 0.5) + NoLegend()
@@ -175,13 +175,18 @@ p.CTComp1 <- ggarrange(p.CT1, p.CTPred1, common.legend = TRUE, legend = "top")
 p.CTComp1
 
 ## Renew Meta.data
-scRNA.SeuObj@meta.data$singleR_classic_PredbyscRNA2 <- scRNA.SeuObj@meta.data$singleR_classic_PredbyscRNA  %>% as.character()
+scRNA.SeuObj@meta.data[[paste0("singleR_",SingleR_DE_method,"_",Remark,2)]] <- scRNA.SeuObj@meta.data[[paste0("singleR_",SingleR_DE_method,"_",Remark)]]  %>% as.character()
+# scRNA.SeuObj@meta.data$singleR_classic_PredbyscRNA2 <- scRNA.SeuObj@meta.data$singleR_classic_PredbyscRNA  %>% as.character()
 Meta.data_Temp <- scRNA.SeuObj@meta.data
 Meta.data_Ref_Temp <- scRNA.SeuObj_Ref@meta.data
-Meta.data_Temp[Meta.data_Temp$CELL %in% Meta.data_Ref_Temp$CELL,]$singleR_classic_PredbyscRNA2 <- Meta.data_Ref_Temp$celltype %>% as.character()
+
+Meta.data_Temp[Meta.data_Temp$CELL %in% Meta.data_Ref_Temp$CELL,][[paste0("singleR_",SingleR_DE_method,"_",Remark,2)]] <- Meta.data_Ref_Temp$celltype %>% as.character()
+# Meta.data_Temp[Meta.data_Temp$CELL %in% Meta.data_Ref_Temp$CELL,]$singleR_classic_PredbyscRNA2 <- Meta.data_Ref_Temp$celltype %>% as.character()
 scRNA.SeuObj@meta.data <- Meta.data_Temp
 
-DimPlot(scRNA.SeuObj, reduction = "umap",group.by = "singleR_classic_PredbyscRNA2")
+p.CTPred2 <-DimPlot(scRNA.SeuObj, reduction = "umap",group.by = "singleR_classic_PredbyscRNA2")
+p.CTPred2
+
 DimPlot(scRNA.SeuObj, reduction = "umap",group.by = "singleR_classic_PredbyscRNA")
 DimPlot(scRNA.SeuObj, reduction = "umap",group.by = "celltype")
 DimPlot(scRNA.SeuObj, reduction = "umap",group.by = "Type")
@@ -224,8 +229,8 @@ dev.off()
 pdf(file = paste0(Save.Path,"/",ProjectName,"_",Remark,"_CompareCTUMAP.pdf"),
     width = 12,  height = 7
 )
-p.CTPred1 %>% BeautifyggPlot(XaThick=1,  YaThick=1, LegPos = c(1, 0.5)) %>%
-  print()
+p.CTPred1 %>% BeautifyggPlot(XaThick=1,  YaThick=1, LegPos = c(1, 0.5)) %>% print()
+p.CTPred2 %>% BeautifyggPlot(XaThick=1,  YaThick=1, LegPos = c(1, 0.5)) %>% print()
 ## Change color
 library(ggsci)
 p.CTPred1 + scale_color_npg() + coord_fixed(ratio = 1) + theme(legend.position = c(1, 0.5))
