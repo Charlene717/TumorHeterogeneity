@@ -1,33 +1,23 @@
 ## SingleRBook Ref: http://bioconductor.org/books/release/SingleRBook/
 ## Example Ref: https://bioconductor.org/packages/devel/bioc/vignettes/SingleR/inst/doc/SingleR.html
 
-# ##### Presetting ######
-#   rm(list = ls()) # Clean variable
-#   memory.limit(300000)
+##### Presetting ######
+  rm(list = ls()) # Clean variable
+  memory.limit(300000)
 
 
 ##### Load Packages #####
-  if(!require("Seurat")) install.packages("Seurat")
   if(!require("tidyverse")) install.packages("tidyverse")
-  if(!require("ggpubr")) install.packages("ggpubr")
-
-  library(ggpubr)
   library(tidyverse)
-  library(Seurat)
 
-  #### BiocManager installation ####
-  ## Check whether the installation of those packages is required from BiocManager
-  if (!require("BiocManager", quietly = TRUE))
-    install.packages("BiocManager")
-  Package.set <- c("SingleR","scRNAseq","celldex","scran","scater","scuttle")
-  for (i in 1:length(Package.set)) {
-    if (!requireNamespace(Package.set[i], quietly = TRUE)){
-      BiocManager::install(Package.set[i])
-    }
-  }
-  ## Load Packages
-  lapply(Package.set, library, character.only = TRUE)
-  rm(Package.set,i)
+  #### Basic and BiocManager installation ####
+  source("FUN_Package_InstLoad.R")
+  FUN_Basic.set <- c("tidyverse","Seurat","ggpubr")
+  FUN_BiocManager.set <- c("SingleR","scRNAseq","celldex","scran","scater","scuttle")
+
+  FUN_Package_InstLoad(Basic.set = FUN_Basic.set, BiocManager.set = FUN_BiocManager.set)
+  rm(FUN_Basic.set, FUN_BiocManager.set)
+
 
 ##### Function setting #####
   ## Call function
@@ -87,7 +77,7 @@
                                    CTFeatures.SeuObj = CTFeatures.SeuObj,
                                    quantile = quantile, tune.thresh = tune.thresh, sd.thresh = sd.thresh,
                                    de.method = de.method,
-                                   Remark = Remark, 
+                                   Remark = Remark,
                                    RefName = RefName,
                                    RefName2 = RefName2,
                                    Save.Path = paste0(Save.Path,"/",Remark), ProjectName = "CT")
@@ -235,7 +225,7 @@
 #   sessionInfo()
 #   ## Ref: https://stackoverflow.com/questions/21967254/how-to-write-a-reader-friendly-sessioninfo-to-text-file
 #   writeLines(capture.output(sessionInfo()), paste0(Save.Path,"/sessionInfo.txt"))
-# 
+#
 # ##### Save RData #####
 #   save.image(paste0(Save.Path,"/SeuratObject_",ProjectName_Ano,".RData"))
 
