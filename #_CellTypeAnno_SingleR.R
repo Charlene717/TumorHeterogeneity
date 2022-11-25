@@ -41,6 +41,7 @@ Sampletype = "PDAC"
 
 Version = paste0(Sys.Date(),"_",ProjectName,"_",Sampletype)
 Save.Path = paste0(getwd(),"/",Version)
+RData_Save.Path = "D:/Dropbox/#_Dataset/Cancer/PDAC/"
 
 ## Create new folder
 if (!dir.exists(Save.Path)){ dir.create(Save.Path) }
@@ -238,9 +239,8 @@ sessionInfo()
 writeLines(capture.output(sessionInfo()), paste0(Save.Path,"/sessionInfo.txt"))
 
 ##### Save RData #####
-rm(scRNA)
-# save.image(paste0("D:/Dropbox/#_Dataset/Cancer/PDAC/",Sys.Date(),"_SeuratObject_",ProjectName,".RData"))
-save.image(paste0("D:/Dropbox/#_Dataset/Cancer/PDAC/",Version,".RData"))
+rm(scRNA, list = str_subset(objects(), pattern = "p.")) # scRNA.SeuObj_Ref
+save.image(paste0(RData_Save.Path, Version, ".RData"))
 
 
 
