@@ -54,6 +54,23 @@ celldexDatabase <- "HumanPrimaryCellAtlasData"
 #   "MonacoImmuneData","MouseRNAseqData","NovershternHematopoieticData")
 SingleR_DE_method <- "classic"
 
+#### Re-dimension reduction ####
+# scRNA.SeuObj <- FindVariableFeatures(scRNA.SeuObj, selection.method = "vst", nfeatures = 2000)
+scRNA.SeuObj <- FindVariableFeatures(scRNA.SeuObj)
+# Run the standard workflow for visualization and clustering
+scRNA.SeuObj <- ScaleData(scRNA.SeuObj, verbose = FALSE)
+# scRNA.SeuObj <- RunPCA(scRNA.SeuObj, npcs = 160, verbose = FALSE)
+scRNA.SeuObj <- RunUMAP(scRNA.SeuObj, reduction = "pca", dims = 1:55,n.neighbors = 10,min.dist = 0.2)
+scRNA.SeuObj <- FindNeighbors(scRNA.SeuObj, reduction = "pca", dims = 1:55)
+scRNA.SeuObj <- FindClusters(scRNA.SeuObj, resolution = 0.3)
+
+## Print UMAP
+DimPlot(scRNA.SeuObj, reduction = "umap",group.by = "seurat_clusters")
+DimPlot(scRNA.SeuObj, reduction = "umap",group.by = "celltype")
+DimPlot(scRNA.SeuObj_Ref, reduction = "umap",group.by = "celltype")
+
+
+
 
 ##### Set References #####
 if(RefType == "BuiltIn_celldex") ## Database: Bulk reference setting for Cell type features
