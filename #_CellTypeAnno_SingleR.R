@@ -190,7 +190,7 @@ p.CTPred2
 DimPlot(scRNA.SeuObj, reduction = "umap",group.by = "singleR_classic_PredbyscRNA")
 DimPlot(scRNA.SeuObj, reduction = "umap",group.by = "celltype")
 DimPlot(scRNA.SeuObj, reduction = "umap",group.by = "Type")
-
+DimPlot(scRNA.SeuObj, reduction = "umap",group.by = "seurat_clusters")
 
 ##### Export result #####
 ## Export PDF
