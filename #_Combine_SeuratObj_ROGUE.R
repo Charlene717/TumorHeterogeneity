@@ -35,7 +35,8 @@
 #### Load data #####
   # load("D:/Dropbox/##_GitHub/##_Charlene/TumorHeterogeneity/2022-08-01_Com_PDAC/scRNA.SeuObj_CDS_PRJCA001063_Combine_Anno_ReDR.RData")
   # load("D:/Dropbox/##_GitHub/##_Charlene/TumorHeterogeneity/2022-11-08_Com_PDAC/SeuratObject_Com.RData")
-  load("D:/Dropbox/#_Dataset/Cancer/PDAC/2022-11-15_CTAnno_singleR_RefPRJCA001063_PDAC.RData")
+  # load("D:/Dropbox/#_Dataset/Cancer/PDAC/2022-11-15_CTAnno_singleR_RefPRJCA001063_PDAC.RData")
+  load("D:/Dropbox/#_Dataset/Cancer/PDAC/2022-12-05_CTAnno_singleR_RefPRJCA001063_PDAC.RData")
 
 ##### Current path and new folder setting* #####
   ProjectName = "Com_ROGUE"
