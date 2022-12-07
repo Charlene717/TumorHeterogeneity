@@ -62,7 +62,7 @@ scRNA.SeuObj <- ScaleData(scRNA.SeuObj, verbose = FALSE)
 # scRNA.SeuObj <- RunPCA(scRNA.SeuObj, npcs = 160, verbose = FALSE)
 scRNA.SeuObj <- RunUMAP(scRNA.SeuObj, reduction = "pca", dims = 1:55,n.neighbors = 10,min.dist = 0.2)
 scRNA.SeuObj <- FindNeighbors(scRNA.SeuObj, reduction = "pca", dims = 1:55)
-scRNA.SeuObj <- FindClusters(scRNA.SeuObj, resolution = 0.3)
+scRNA.SeuObj <- FindClusters(scRNA.SeuObj, resolution = 0.35)
 
 ## Print UMAP
 DimPlot(scRNA.SeuObj, reduction = "umap",group.by = "seurat_clusters")
