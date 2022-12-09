@@ -361,7 +361,7 @@
       Meta_Duc2.df<- scRNA_Duc2.SeuObj@meta.data
       Meta_Sub.df[Meta_Sub.df$Cell_ID %in% Meta_Duc2.df$Cell_ID,]$Cell_type <- Meta_Duc2.df$celltype_Sub %>% as.character()
       scRNA_Sub.SeuObj@meta.data <- Meta_Sub.df
-      # scRNA_Sub.SeuObj@meta.data$Cell_type <- as.factor(scRNA_Sub.SeuObj@meta.data$Cell_type)
+      scRNA_Sub.SeuObj@meta.data$Cell_type <- as.factor(scRNA_Sub.SeuObj@meta.data$Cell_type)
       DimPlot(scRNA_Sub.SeuObj, reduction = "umap",group.by = "Cell_type")
 
       rm(Meta_Sub.df,Meta_Duc2.df)
