@@ -17,7 +17,7 @@ rm(list=setdiff(ls(), c("scRNA.SeuObj","scRNA_Sub.SeuObj")))
 
 ## plot UMAP
 library(Seurat)
-scRNA_Sub.SeuObj@meta.data$Cell_type <- as.factor(scRNA_Sub.SeuObj@meta.data$Cell_type)
+# scRNA_Sub.SeuObj@meta.data$Cell_type <- as.factor(scRNA_Sub.SeuObj@meta.data$Cell_type)
 scRNA_Sub.SeuObj@meta.data$Cell_type <- gsub("_", " ", scRNA_Sub.SeuObj@meta.data$Cell_type)
 scRNA_Sub.SeuObj <- scRNA_Sub.SeuObj[,!scRNA_Sub.SeuObj$Cell_type %in% c("T cell","Fibroblast cell")]
 
