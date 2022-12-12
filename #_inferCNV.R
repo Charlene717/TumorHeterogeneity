@@ -18,7 +18,9 @@ rm(list=setdiff(ls(), c("scRNA.SeuObj","scRNA_Sub.SeuObj")))
 ## plot UMAP
 library(Seurat)
 
-scRNA_Sub.SeuObj@meta.data$Cell_type <- gsub("_", " ", scRNA_Sub.SeuObj@meta.data$Cell_type) #Note!!# Will make factor become character!!
+# scRNA_Sub.SeuObj@meta.data$Cell_type <- gsub("_", " ", scRNA_Sub.SeuObj@meta.data$Cell_type) #Note!!# Will make factor become character!!
+scRNA_Sub.SeuObj@meta.data$Cell_type <- gsub(" ", "_", scRNA_Sub.SeuObj@meta.data$Cell_type) #Note!!# Will make factor become character!!
+#Try small data# scRNA_Sub.SeuObj <- scRNA_Sub.SeuObj[,scRNA_Sub.SeuObj$Cell_type %in% c("Acinar_cell","Ductal_cell_type_1","Ductal_cell_type_2")]
 scRNA_Sub.SeuObj <- scRNA_Sub.SeuObj[,!scRNA_Sub.SeuObj$Cell_type %in% c("T cell","Fibroblast cell")]
 scRNA_Sub.SeuObj@meta.data$Cell_type <- as.factor(scRNA_Sub.SeuObj@meta.data$Cell_type)
 
@@ -49,7 +51,7 @@ source("FUN_inferCNV.R")
 infercnv_obj <- inferCNV(scRNA_Sub.SeuObj, AnnoSet = "Cell_type",
                          SpeciSet = Species,
                          Path = PathinferCNV,
-                         RefSet = c("Acinar cell"),
+                         RefSet = c("Acinar_cell"),
                          CreateInfercnvObject.lt = list(chr_exclude = c("chrM")))
 ##### save.image #####
 save.image(paste0(RData_Save.Path,"/",Version,".RData"))
