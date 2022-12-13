@@ -21,7 +21,7 @@ library(Seurat)
 # scRNA_Sub.SeuObj@meta.data$Cell_type <- gsub("_", " ", scRNA_Sub.SeuObj@meta.data$Cell_type) #Note!!# Will make factor become character!!
 scRNA_Sub.SeuObj@meta.data$Cell_type <- gsub(" ", "_", scRNA_Sub.SeuObj@meta.data$Cell_type) #Note!!# Will make factor become character!!
 #Try small data# scRNA_Sub.SeuObj <- scRNA_Sub.SeuObj[,scRNA_Sub.SeuObj$Cell_type %in% c("Acinar_cell","Ductal_cell_type_1","Ductal_cell_type_2")]
-scRNA_Sub.SeuObj <- scRNA_Sub.SeuObj[,!scRNA_Sub.SeuObj$Cell_type %in% c("T cell","Fibroblast cell")]
+scRNA_Sub.SeuObj <- scRNA_Sub.SeuObj[,!scRNA_Sub.SeuObj$Cell_type %in% c("T_cell","Fibroblast_cell")]
 scRNA_Sub.SeuObj@meta.data$Cell_type <- as.factor(scRNA_Sub.SeuObj@meta.data$Cell_type)
 
 DimPlot(scRNA_Sub.SeuObj, reduction = "umap",group.by = "Cell_type")
@@ -52,6 +52,6 @@ infercnv_obj <- inferCNV(scRNA_Sub.SeuObj, AnnoSet = "Cell_type",
                          SpeciSet = Species,
                          Path = PathinferCNV,
                          RefSet = c("Acinar_cell"),
-                         CreateInfercnvObject.lt = list(chr_exclude = c("chrM")))
+                         CreateInfercnvObject.lt = list(delim="\t",max_cells_per_group = NULL,min_max_counts_per_cell = c(100, +Inf),chr_exclude = c("chrX", "chrY", "chrM")))
 ##### save.image #####
 save.image(paste0(RData_Save.Path,"/",Version,".RData"))
