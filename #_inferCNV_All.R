@@ -8,14 +8,27 @@ if(!require("tidyverse")) install.packages("tidyverse")
 library(tidyverse)
 
 ##### Load data ######
+# ## Load all
+# load("D:/Dropbox/#_Dataset/Cancer/PDAC/2022-12-07_TrajAna_PCA_PDAC_ROGUE_Monocle3.RData")
+# ## Clean up the object
+# rm(list=setdiff(ls(), c("scRNA.SeuObj")))
+
+## Small dataset
 ## Load all
-load("D:/Dropbox/#_Dataset/Cancer/PDAC/2022-12-07_TrajAna_PCA_PDAC_ROGUE_Monocle3.RData")
+load("D:/Dropbox/##_GitHub/##_CAESAR/MagicDisc/2022-12-13_SeuratSmall_PADC/2022-12-13_SeuratSmall_PADC_SmallData.RData")
 ## Clean up the object
-rm(list=setdiff(ls(), c("scRNA.SeuObj")))
+rm(list=setdiff(ls(), str_subset(objects(), pattern = "Small")))
+scRNA.SeuObj <- scRNA_Small.SeuObj
+
+scRNA.SeuObj@meta.data$Cell_type <- gsub(" ", "_", scRNA.SeuObj@meta.data$Cell_type) #Note!!# Will make factor become character!!
+scRNA.SeuObj@meta.data$Cell_type <- as.factor(scRNA.SeuObj@meta.data$Cell_type)
+
+
 
 ## plot UMAP
 library(Seurat)
 DimPlot(scRNA.SeuObj, reduction = "umap",group.by = "singleR_classic_PredbyscRNA")
+DimPlot(scRNA.SeuObj, reduction = "umap",group.by = "Cell_type")
 
 ##### Current path and new folder setting* #####
 ProjectName = paste0("inferCNV")
