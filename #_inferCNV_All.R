@@ -61,10 +61,13 @@ source("FUN_inferCNV.R")
 #                          RefSet = c("Acinar cell"),
 #                          CreateInfercnvObject.lt = list(chr_exclude = c("chrM")))
 
+## Ref: https://rdrr.io/bioc/infercnv/man/CreateInfercnvObject.html
+## Ref: https://rdrr.io/github/broadinstitute/inferCNV/man/run.html
 infercnv_obj <- inferCNV(scRNA.SeuObj, AnnoSet = "Cell_type",
                          SpeciSet = Species,
                          Path = PathinferCNV,
                          RefSet = c("Acinar_cell"),
+                         inferCNVRun.lt = list(cluster_by_groups = FALSE, plot_steps=TRUE, no_plot=FALSE, resume_mode = FALSE, k_nn = 30),
                          CreateInfercnvObject.lt = list(delim="\t",max_cells_per_group = NULL,min_max_counts_per_cell = c(100, +Inf),chr_exclude = c("chrX", "chrY", "chrM")))
 
 
