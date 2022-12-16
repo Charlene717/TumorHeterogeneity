@@ -52,6 +52,8 @@ infercnv_obj <- inferCNV(scRNA_Sub.SeuObj, AnnoSet = "Cell_type",
                          SpeciSet = Species,
                          Path = PathinferCNV,
                          RefSet = c("Acinar_cell"),
+                         inferCNVRun.lt = list(cluster_by_groups = FALSE, cluster_references= TRUE, plot_steps=FALSE, no_plot=FALSE, resume_mode = FALSE, k_nn = 30),
                          CreateInfercnvObject.lt = list(delim="\t",max_cells_per_group = NULL,min_max_counts_per_cell = c(100, +Inf),chr_exclude = c("chrX", "chrY", "chrM")))
+
 ##### save.image #####
 save.image(paste0(RData_Save.Path,"/",Version,".RData"))
