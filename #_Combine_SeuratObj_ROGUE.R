@@ -33,9 +33,6 @@
 
 
 #### Load data #####
-  # load("D:/Dropbox/##_GitHub/##_Charlene/TumorHeterogeneity/2022-08-01_Com_PDAC/scRNA.SeuObj_CDS_PRJCA001063_Combine_Anno_ReDR.RData")
-  # load("D:/Dropbox/##_GitHub/##_Charlene/TumorHeterogeneity/2022-11-08_Com_PDAC/SeuratObject_Com.RData")
-  # load("D:/Dropbox/#_Dataset/Cancer/PDAC/2022-11-15_CTAnno_singleR_RefPRJCA001063_PDAC.RData")
   load("D:/Dropbox/#_Dataset/Cancer/PDAC/2022-12-05_CTAnno_singleR_RefPRJCA001063_PDAC.RData")
 
 ##### Current path and new folder setting* #####
@@ -46,9 +43,7 @@
   Version = paste0(Sys.Date(),"_",ProjectName,"_",Sampletype)
   Save.Path = paste0(getwd(),"/",Version)
   ## Create new folder
-  if (!dir.exists(Save.Path)){
-    dir.create(Save.Path)
-  }
+  if (!dir.exists(Save.Path)){dir.create(Save.Path)}
 
 ##### Extract data #####
   ## Gene GeneExp.dfession
@@ -57,7 +52,6 @@
 
 ##### Run ROGUE #####
   ## Filtering out low-abundance genes and low-quality cells
-  GeneExp_Ori.df <- GeneExp.df
   GeneExp.df <- matr.filter(GeneExp.df, min.cells = 10, min.genes = 10)
 
   ## GeneExp.dfession entropy model

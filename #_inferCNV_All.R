@@ -32,7 +32,7 @@ DimPlot(scRNA.SeuObj, reduction = "umap",group.by = "Cell_type")
 
 ##### Current path and new folder setting* #####
 ProjectName = paste0("inferCNV")
-Sampletype = "PDAC2"
+Sampletype = "PDAC4"
 
 Version = paste0(Sys.Date(),"_",ProjectName,"_",Sampletype)
 Save.Path = paste0(getwd(),"/",Version)
@@ -49,9 +49,7 @@ Species = "Human"
 ##### 013 inferCNV #####
 ## Create new folder
 PathinferCNV <- paste0(Save.Path,"/","D01_inferCNV")
-if (!dir.exists(PathinferCNV)){
-  dir.create(PathinferCNV)
-}
+if (!dir.exists(PathinferCNV)){dir.create(PathinferCNV)}
 
 source("FUN_inferCNV.R")
 
@@ -67,9 +65,11 @@ infercnv_obj <- inferCNV(scRNA.SeuObj, AnnoSet = "Cell_type",
                          SpeciSet = Species,
                          Path = PathinferCNV,
                          RefSet = c("Acinar_cell"),
-                         inferCNVRun.lt = list(cluster_by_groups = FALSE, plot_steps=TRUE, no_plot=FALSE, resume_mode = FALSE, k_nn = 30),
+                         inferCNVRun.lt = list(cluster_by_groups = FALSE, cluster_references= FALSE, plot_steps= TRUE, no_plot=FALSE, resume_mode = FALSE, k_nn = 30),
                          CreateInfercnvObject.lt = list(delim="\t",max_cells_per_group = NULL,min_max_counts_per_cell = c(100, +Inf),chr_exclude = c("chrX", "chrY", "chrM")))
 
+## Other way
+source("#_MagicDisc_DSA_05_inferCNV.R")
 
 ##### save.image #####
 save.image(paste0(RData_Save.Path,"/",Version,".RData"))
