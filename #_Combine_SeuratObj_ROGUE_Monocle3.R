@@ -33,10 +33,29 @@
 
 
 #### Load data #####
-  # load("D:/Dropbox/##_GitHub/##_Charlene/TumorHeterogeneity/2022-08-01_Com_PDAC/scRNA.SeuObj_CDS_PRJCA001063_Combine_Anno_ReDR.RData")
-  # load("D:/Dropbox/##_GitHub/##_Charlene/TumorHeterogeneity/2022-11-08_Com_PDAC/SeuratObject_Com.RData")
-  # load("D:/Dropbox/#_Dataset/Cancer/PDAC/2022-12-05_CTAnno_singleR_RefPRJCA001063_PDAC.RData")
-  load("D:/Dropbox/##_GitHub/##_Charlene/TrajectoryAnalysis/2022-12-07_TrajAna_PCA_PDAC/scRNA.SeuObj_CDS_PRJCA001063_TrajAna_PCA.RData")
+  # # load("D:/Dropbox/##_GitHub/##_Charlene/TumorHeterogeneity/2022-08-01_Com_PDAC/scRNA.SeuObj_CDS_PRJCA001063_Combine_Anno_ReDR.RData")
+  # # load("D:/Dropbox/##_GitHub/##_Charlene/TumorHeterogeneity/2022-11-08_Com_PDAC/SeuratObject_Com.RData")
+  # # load("D:/Dropbox/#_Dataset/Cancer/PDAC/2022-12-05_CTAnno_singleR_RefPRJCA001063_PDAC.RData")
+  # load("D:/Dropbox/##_GitHub/##_Charlene/TrajectoryAnalysis/2022-12-07_TrajAna_PCA_PDAC/scRNA.SeuObj_CDS_PRJCA001063_TrajAna_PCA.RData")
+  # ## Clean up the object
+  # rm(list=setdiff(ls(), c("scRNA.SeuObj")))
+
+  ## Small dataset
+  ## Load all
+  load("D:/Dropbox/##_GitHub/##_CAESAR/MagicDisc/2022-12-13_SeuratSmall_PADC/2022-12-13_SeuratSmall_PADC_SmallData.RData")
+
+  ## Clean up the object
+  rm(list=setdiff(ls(), str_subset(objects(), pattern = "Small")))
+
+  scRNA.SeuObj <- scRNA_Small.SeuObj
+
+  scRNA.SeuObj@meta.data$Cell_type <- gsub(" ", "_", scRNA.SeuObj@meta.data$Cell_type) #Note!!# Will make factor become character!!
+  scRNA.SeuObj@meta.data$Cell_type <- as.factor(scRNA.SeuObj@meta.data$Cell_type)
+
+  ## plot UMAP
+  library(Seurat)
+  DimPlot(scRNA.SeuObj, reduction = "umap",group.by = "singleR_classic_PredbyscRNA")
+  DimPlot(scRNA.SeuObj, reduction = "umap",group.by = "Cell_type")
 
 ##### Current path and new folder setting* #####
   ProjectName = "Com_ROGUE_Monocle3"
