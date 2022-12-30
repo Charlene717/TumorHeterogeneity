@@ -19,13 +19,13 @@
 
 inferCNV <- function(scRNA.SeuObj, AnnoSet = "celltype",
                      SpeciSet = Species,
-                     Path = "", infercnvCutOff = 0.1, denoiseSet = TRUE, HMMSet = TRUE,
+                     Path = "", infercnvCutOff = 0.1, denoiseSet = TRUE, HMMSet = FALSE,
                      GenecodeSet.list = list(Default = TRUE,
                                         HumanGenecode = paste0(getwd(),"/Input_files/Genecode/gencode.v40.annotation.txt"), # "/Input_files/Genecode/gencode_v19_gene_pos.txt"
                                         MouseGenecode = paste0(getwd(),"/Input_files/Genecode/gencode.vM29.annotation.txt")),
                      RefSet = c("normal"),
-                     CreateInfercnvObject.lt = "",
-                     inferCNVRun.lt = ""
+                     CreateInfercnvObject.lt = NA,
+                     inferCNVRun.lt = NA
                      ) {
 
   memory.limit(150000)
@@ -114,13 +114,13 @@ inferCNV <- function(scRNA.SeuObj, AnnoSet = "celltype",
 
   #### create the infercnv object ####
   ## Ref: https://rdrr.io/bioc/infercnv/man/CreateInfercnvObject.html
-  if(CreateInfercnvObject.lt == ""){
+  if(is.na(CreateInfercnvObject.lt)){
      CreateInfercnvObject.lt = list(delim="\t",max_cells_per_group = NULL,min_max_counts_per_cell = c(100, +Inf),chr_exclude = c("chrX", "chrY", "chrM"))
   }
 
   formals(CreateInfercnvObject)[names(CreateInfercnvObject.lt)] <- CreateInfercnvObject.lt
-  CreateInfercnvObject.lt = CreateInfercnvObject.lt
-  formals(CreateInfercnvObject)[names(CreateInfercnvObject.lt)] <- CreateInfercnvObject.lt
+  # CreateInfercnvObject.lt = CreateInfercnvObject.lt
+  # formals(CreateInfercnvObject)[names(CreateInfercnvObject.lt)] <- CreateInfercnvObject.lt
   infercnv_obj = CreateInfercnvObject(raw_counts_matrix = EM.mt,
                                       annotations_file = Anno.mt,
                                       gene_order_file = GenecodePath,
@@ -130,13 +130,14 @@ inferCNV <- function(scRNA.SeuObj, AnnoSet = "celltype",
 
   #### Run inferCNV ####
   ## Ref: https://rdrr.io/github/broadinstitute/inferCNV/man/run.html
-  if(inferCNVRun.lt == ""){
-    inferCNVRun.lt = list(cluster_by_groups=TRUE, plot_steps=FALSE, no_plot=FALSE, resume_mode = FALSE, k_nn = 30)
+  if(is.na(inferCNVRun.lt)){
+    inferCNVRun.lt = list(cluster_by_groups = FALSE, cluster_references = TRUE, plot_steps = TRUE, no_plot = FALSE, resume_mode = FALSE, k_nn = 30)
   }
 
+  library(infercnv)
   formals(run)[names(inferCNVRun.lt)] <- inferCNVRun.lt
-  inferCNVRun.lt = inferCNVRun.lt
-  formals(run)[names(inferCNVRun.lt)] <- inferCNVRun.lt
+  # inferCNVRun.lt = inferCNVRun.lt
+  # formals(run)[names(inferCNVRun.lt)] <- inferCNVRun.lt
   infercnv_obj = infercnv::run(infercnv_obj,
                                cutoff = infercnvCutOff,  # use 1 for smart-seq, 0.1 for 10x-genomics
                                out_dir= paste0(Path), # out_dir=tempfile(),  #  out_dir= "output_dir",
